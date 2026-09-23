@@ -1,0 +1,184 @@
+/* ==========================================================================
+   Tokens, reset, typography.
+
+   The palette is one pair — ink and paper — and the themes swap which is
+   which. Every tone on the page is that ink at reduced alpha, so nothing can
+   drift off-monochrome. Colours are stored as raw channel triples so alpha
+   can be applied at the point of use.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap');
+
+:root {
+  --ink-rgb: 0 0 0;
+  --paper-rgb: 255 255 255;
+
+  --ink: rgb(var(--ink-rgb));
+  --paper: rgb(var(--paper-rgb));
+
+  --ink-70: rgb(var(--ink-rgb) / 0.7);
+  --ink-45: rgb(var(--ink-rgb) / 0.45);
+  --ink-20: rgb(var(--ink-rgb) / 0.2);
+  --ink-10: rgb(var(--ink-rgb) / 0.1);
+
+  --font: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  /* Fluid scale. Display sizes are set in vw so they keep their relationship
+     to the viewport edge they are allowed to run into. */
+  --size-display: clamp(3.25rem, 13vw, 12.5rem);
+  --size-title: clamp(2.5rem, 8.5vw, 7.5rem);
+  --size-lead: clamp(1.0625rem, 1.15vw + 0.8rem, 1.5rem);
+  --size-body: clamp(0.9375rem, 0.3vw + 0.85rem, 1.0625rem);
+  --size-meta: 0.8125rem;
+
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --measure: 60ch;
+  --rule: 1px solid var(--ink-20);
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --ink-rgb: 255 255 255;
+  --paper-rgb: 0 0 0;
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Lenis drives scrolling; native smooth behaviour would fight it. */
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--size-body);
+  font-weight: 400;
+  line-height: 1.6;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.5s var(--ease), color 0.5s var(--ease);
+}
+
+h1,
+h2,
+h3,
+p,
+figure,
+blockquote,
+ul,
+ol {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+/* --- Display type ---------------------------------------------------------
+   One family, used at both ends of its width and weight axes: hairline and
+   very wide for display, normal and regular for reading. */
+
+.display,
+.title {
+  font-weight: 200;
+  font-stretch: 125%;
+  line-height: 0.86;
+  letter-spacing: -0.035em;
+  text-transform: none;
+}
+
+.display {
+  font-size: var(--size-display);
+}
+
+.title {
+  font-size: var(--size-title);
+}
+
+.lead {
+  font-size: var(--size-lead);
+  font-weight: 300;
+  line-height: 1.45;
+  letter-spacing: -0.012em;
+  max-width: 46ch;
+  text-wrap: pretty;
+}
+
+.body {
+  max-width: var(--measure);
+  color: var(--ink-70);
+}
+
+.body + .body {
+  margin-top: 1em;
+}
+
+.meta {
+  font-size: var(--size-meta);
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: var(--ink-45);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Reveal ---------------------------------------------------------------
+   The heading rises into its own frame. Vertical padding is cancelled by an
+   equal negative margin so the clipping box does not eat descenders or add
+   layout space. */
+
+[data-reveal] {
+  overflow: hidden;
+  padding-block: 0.14em;
+  margin-block: -0.14em;
+}
+
+[data-reveal] > span {
+  display: block;
+  transform: translateY(105%);
+  transition: transform 1.05s var(--ease);
+}
+
+[data-reveal][data-revealed] > span {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] > span {
+    transform: none;
+    transition: none;
+  }
+
+  body {
+    transition: none;
+  }
+}

@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>Alexius Lee — Business and Financial Technology</title>
+    <meta
+      name="description"
+      content="Alexius Lee — business and financial technology student in Singapore, interning as a product manager at GovTech. Selected projects, experience and contact."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Resolve the theme before first paint so there is no flash of the
+         wrong background. Mirrors the logic in src/ui/theme.js. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('portfolio-theme');
+          var dark =
+            stored === 'dark' ||
+            (!stored &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <canvas class="scene" data-scene aria-hidden="true"></canvas>
+    <div class="shade" aria-hidden="true"></div>
+
+    <header class="chrome">
+      <a class="wordmark" href="#intro">Alexius Lee</a>
+      <div class="chrome-right">
+        <span class="marker" data-marker aria-live="polite">Intro</span>
+        <button class="toggle" type="button" data-theme-toggle aria-pressed="false">
+          <span data-theme-label>Dark</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+      <!-- Intro ------------------------------------------------------------>
+      <section class="section section--intro" id="intro" data-section="Intro">
+        <div class="bleed">
+          <h1 class="display" data-reveal><span>Alexius Lee</span></h1>
+        </div>
+
+        <div class="column" style="margin-top: clamp(1.5rem, 4vh, 2.5rem)">
+          <p class="lead">
+            Tech enthusiast with a foundation in ICT and a passion for solving
+            problems through innovation. Currently diving into Business and
+            Financial Technology to bridge the gap between tech and finance.
+            Always eager to learn, collaborate, and create impactful solutions
+            that drive the future of digital transformation.
+          </p>
+
+          <div class="intro-meta">
+            <span class="meta">Business and financial technology</span>
+            <span class="meta">Based in Singapore</span>
+            <span class="meta">Open to work</span>
+          </div>
+
+          <p class="intro-scroll">Scroll to read on.</p>
+        </div>
+      </section>
+
+      <!-- Work ------------------------------------------------------------->
+      <section class="section" id="work" data-section="Work">
+        <div class="bleed">
+          <h2 class="title" data-reveal><span>Selected work</span></h2>
+        </div>
+
+        <ul class="work-list">
+          <li class="work-item">
+            <a class="work-link" href="#intro" data-strand="0.05">
+              <span class="work-name">This Site</span>
+              <span class="work-note">
+                The site you are on. One Three.js object that reforms into a
+                different shape for every section.
+              </span>
+              <span class="meta work-year">2026</span>
+            </a>
+          </li>
+
+          <li class="work-item">
+            <a class="work-link" href="#work" data-strand="0.22">
+              <span class="work-name">Portfolio Analytics</span>
+              <span class="work-note">
+                Streamlit dashboard tracking a Singapore multi-asset book, with
+                live broker pricing and labelled fallbacks.
+              </span>
+              <span class="meta work-year">2026</span>
+            </a>
+          </li>
+
+          <li class="work-item">
+            <a class="work-link" href="#work" data-strand="0.38">
+              <span class="work-name">SCI Copilot</span>
+              <span class="work-note">
+                Copilot for insurance agents: knowledge retrieval, compliance
+                checks and document drift detection, as an installable PWA.
+              </span>
+              <span class="meta work-year">2026</span>
+            </a>
+          </li>
+
+          <li class="work-item">
+            <a class="work-link" href="#work" data-strand="0.55">
+              <span class="work-name">GrowcerySG</span>
+              <span class="work-note">
+                Urban farming marketplace with produce trading, carbon footprint
+                tracking and gamified sustainability tasks.
+              </span>
+              <span class="meta work-year">2026</span>
+            </a>
+          </li>
+
+          <li class="work-item">
+            <a class="work-link" href="#work" data-strand="0.72">
+              <span class="work-name">Housing and Fertility</span>
+              <span class="work-note">
+                Tableau study linking HDB resale prices and median income to
+                Singapore's falling fertility rate.
+              </span>
+              <span class="meta work-year">2025</span>
+            </a>
+          </li>
+
+          <li class="work-item">
+            <a class="work-link" href="#work" data-strand="0.89">
+              <span class="work-name">pay2live</span>
+              <span class="work-note">
+                Modular web app for clinic operations, with scheduling, WhatsApp
+                OTP and real-time notifications.
+              </span>
+              <span class="meta work-year">2025</span>
+            </a>
+          </li>
+        </ul>
+      </section>
+
+      <!-- Experience -------------------------------------------------------->
+      <section class="section" id="experience" data-section="Experience">
+        <div class="bleed">
+          <h2 class="title" data-reveal><span>Experience</span></h2>
+        </div>
+
+        <div class="roles">
+          <article class="role">
+            <span class="meta">2026 to now</span>
+            <div>
+              <h3 class="role-title">Product Management Intern, GovTech</h3>
+            </div>
+          </article>
+
+          <article class="role">
+            <span class="meta">2025 to 2026</span>
+            <div>
+              <h3 class="role-title">
+                Key Account Manager, SME Sales, Veritas Organisation
+              </h3>
+              <p class="role-body">
+                Managed SME energy clients end to end, from sourcing leads
+                through outreach and email campaigns to client acquisition and
+                service satisfaction. Ran residential roadshows for the brand.
+              </p>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- Stack -------------------------------------------------------------->
+      <section class="section" id="stack" data-section="Stack">
+        <div class="bleed">
+          <h2 class="title" data-reveal><span>What I work in</span></h2>
+        </div>
+
+        <div class="groups">
+          <div>
+            <h3 class="group-name">Build</h3>
+            <ul class="group-list">
+              <li>Python</li>
+              <li>JavaScript</li>
+              <li>React</li>
+              <li>C# and ASP.NET</li>
+              <li>HTML and CSS</li>
+              <li>Flask and Jinja</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="group-name">Data</h3>
+            <ul class="group-list">
+              <li>Tableau</li>
+              <li>Business statistics</li>
+              <li>Data analysis</li>
+              <li>Data visualisation</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="group-name">Tools</h3>
+            <ul class="group-list">
+              <li>Vite</li>
+              <li>Supabase</li>
+              <li>MongoDB and SQL Server</li>
+              <li>Tailwind CSS</li>
+              <li>jQuery</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="group-name">Business</h3>
+            <ul class="group-list">
+              <li>Project delivery</li>
+              <li>Key account management</li>
+              <li>Lead sourcing</li>
+              <li>Client communication</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="credentials">
+          <div>
+            <h3 class="group-name">Education</h3>
+            <ul class="group-list group-list--wide">
+              <li>
+                Diploma in Business and Financial Technology, Nanyang
+                Polytechnic
+              </li>
+              <li>Common ICT Programme, Nanyang Polytechnic</li>
+              <li>O Levels, Beatty Secondary School</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="group-name">Certifications</h3>
+            <ul class="group-list group-list--wide">
+              <li>JavaScript and Python, HackerRank</li>
+              <li>Cybersecurity Fundamentals, IBM</li>
+              <li>Web Development Fundamentals, IBM</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact ------------------------------------------------------------>
+      <section class="section" id="contact" data-section="Contact">
+        <div class="bleed">
+          <h2 class="title" data-reveal><span>Get in touch</span></h2>
+        </div>
+
+        <div class="column column--narrow" style="margin-top: clamp(1.5rem, 4vh, 2.5rem)">
+          <p class="body">
+            I am open to work and I read everything that arrives. Email reaches
+            me fastest.
+          </p>
+
+          <div class="contact-links">
+            <a class="contact-link" href="mailto:alex888ius@gmail.com">Email</a>
+            <a class="contact-link" href="https://github.com/axlxius" rel="noreferrer">GitHub</a>
+            <a
+              class="contact-link"
+              href="https://www.linkedin.com/in/alexius-lee-79461b307/"
+              rel="noreferrer"
+              >LinkedIn</a
+            >
+            <!-- To publish your resume: save the PDF as public/resume.pdf and
+                 uncomment this link. Note that anything in the file becomes
+                 public, including your phone number.
+            <a class="contact-link" href="./resume.pdf">Resume</a>
+            -->
+          </div>
+        </div>
+
+        <div class="colophon">
+          <span class="meta">Built with Three.js and Vite</span>
+          <span class="meta">Singapore</span>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

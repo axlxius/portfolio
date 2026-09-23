@@ -1,0 +1,331 @@
+/* ==========================================================================
+   Page structure.
+
+   Spacing between sections is owned by .section alone. No other selector sets
+   block padding on a section, so nothing here can cancel anything else out.
+   ========================================================================== */
+
+/* --- Fixed layers --------------------------------------------------------- */
+
+.scene {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease);
+}
+
+:root[data-ready] .scene {
+  opacity: 1;
+}
+
+.page {
+  position: relative;
+  z-index: 1;
+}
+
+/* Keeps long-form copy readable over the lattice without hiding it. */
+.shade {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 80% at 18% 50%,
+    rgb(var(--paper-rgb) / 0.82) 0%,
+    rgb(var(--paper-rgb) / 0.45) 45%,
+    transparent 78%
+  );
+}
+
+/* --- Chrome --------------------------------------------------------------- */
+
+.chrome {
+  position: fixed;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  top: clamp(1rem, 2.5vw, 2rem);
+  right: var(--gutter);
+  left: var(--gutter);
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.chrome > * {
+  pointer-events: auto;
+}
+
+.wordmark {
+  font-size: var(--size-meta);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.chrome-right {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.75rem);
+  pointer-events: none;
+}
+
+.marker {
+  font-size: var(--size-meta);
+  font-weight: 500;
+  color: var(--ink-45);
+  font-variant-numeric: tabular-nums;
+}
+
+.toggle {
+  pointer-events: auto;
+  appearance: none;
+  background: transparent;
+  border: var(--rule);
+  border-radius: 999px;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--size-meta);
+  font-weight: 500;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease), background-color 0.3s var(--ease);
+}
+
+.toggle:hover {
+  background: var(--ink-10);
+  border-color: var(--ink-45);
+}
+
+/* --- Sections ------------------------------------------------------------- */
+
+.section {
+  position: relative;
+  padding-block: clamp(7rem, 18vh, 12rem);
+  padding-inline: var(--gutter);
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.section--intro {
+  justify-content: flex-end;
+  padding-block-end: clamp(4rem, 12vh, 8rem);
+}
+
+/* Display type is set flush left and allowed to run past the right edge.
+   The clip is intentional — the line is a held note, not a contained label. */
+.bleed {
+  width: 100vw;
+  margin-inline-start: calc(var(--gutter) * -1);
+  padding-inline-start: var(--gutter);
+  overflow: hidden;
+}
+
+/* Content column sits left of centre against the open right-hand field. */
+.column {
+  max-width: 46rem;
+}
+
+.column--narrow {
+  max-width: 34rem;
+}
+
+.stack-sm > * + * {
+  margin-top: 1.25rem;
+}
+
+.stack-md > * + * {
+  margin-top: clamp(2rem, 5vh, 3.5rem);
+}
+
+/* --- Intro ---------------------------------------------------------------- */
+
+.intro-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2.5rem;
+  margin-top: clamp(2rem, 6vh, 3.5rem);
+}
+
+.intro-scroll {
+  margin-top: clamp(2.5rem, 7vh, 4rem);
+  color: var(--ink-45);
+  font-size: var(--size-meta);
+  font-weight: 500;
+}
+
+/* --- Work ----------------------------------------------------------------- */
+
+.work-list {
+  border-top: var(--rule);
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+}
+
+.work-item {
+  border-bottom: var(--rule);
+}
+
+.work-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) auto;
+  gap: 0.35rem 2rem;
+  align-items: baseline;
+  padding-block: clamp(1.35rem, 3vh, 2.1rem);
+  transition: padding-inline-start 0.45s var(--ease), color 0.3s var(--ease);
+}
+
+.work-link:hover,
+.work-link:focus-visible {
+  padding-inline-start: 1.1rem;
+}
+
+.work-name {
+  font-size: clamp(1.35rem, 2.6vw, 2.25rem);
+  font-weight: 300;
+  font-stretch: 112%;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.work-note {
+  color: var(--ink-70);
+  font-size: var(--size-body);
+}
+
+.work-year {
+  justify-self: end;
+}
+
+@media (max-width: 760px) {
+  .work-link {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .work-note {
+    grid-column: 1 / -1;
+  }
+}
+
+/* --- Experience ----------------------------------------------------------- */
+
+.roles {
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+}
+
+.role {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr);
+  gap: 0.35rem 2rem;
+  padding-block: clamp(1.4rem, 3vh, 2rem);
+  border-top: var(--rule);
+}
+
+.role-title {
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.role-body {
+  color: var(--ink-70);
+  margin-top: 0.4rem;
+  max-width: 48ch;
+}
+
+@media (max-width: 760px) {
+  .role {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Stack ---------------------------------------------------------------- */
+
+.groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: clamp(2rem, 4vw, 3.5rem);
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  max-width: 62rem;
+}
+
+.group-name {
+  font-size: var(--size-body);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding-bottom: 0.7rem;
+  border-bottom: var(--rule);
+}
+
+.group-list {
+  margin-top: 0.9rem;
+  color: var(--ink-70);
+}
+
+.group-list li + li {
+  margin-top: 0.3rem;
+}
+
+/* Entries that run to more than one line need room to breathe. */
+.group-list--wide li {
+  line-height: 1.45;
+}
+
+.group-list--wide li + li {
+  margin-top: 0.65rem;
+}
+
+/* Education and certifications sit below the skill groups, divided from them,
+   because they answer a different question than "what do you work in". */
+.credentials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: clamp(1.75rem, 4vw, 3.5rem);
+  max-width: 62rem;
+  margin-top: clamp(2.75rem, 7vh, 4.5rem);
+  padding-top: clamp(1.75rem, 4vh, 2.75rem);
+  border-top: var(--rule);
+}
+
+/* --- Contact -------------------------------------------------------------- */
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2.5rem;
+  margin-top: clamp(2rem, 5vh, 3rem);
+}
+
+.contact-link {
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+  font-weight: 400;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--ink-45);
+  transition: border-color 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+.contact-link:hover,
+.contact-link:focus-visible {
+  border-color: var(--ink);
+}
+
+.colophon {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  margin-top: clamp(4rem, 12vh, 8rem);
+  padding-top: 1.25rem;
+  border-top: var(--rule);
+}
+
+/* --- Fallback ------------------------------------------------------------- */
+
+:root[data-no-webgl] .shade {
+  display: none;
+}
