@@ -2,6 +2,8 @@
 
 Minimal black-and-white portfolio with a scroll-driven WebGL scene.
 
+**Live:** <https://alexius-lee.vercel.app> · **Repo:** <https://github.com/axlxius/portfolio>
+
 ```bash
 npm install
 npm run dev      # http://localhost:5173
@@ -9,8 +11,26 @@ npm run build    # static output in dist/
 npm run preview  # serve the build locally
 ```
 
-Deploy `dist/` to any static host. `vite.config.js` sets `base: './'`, so it
-also works from a subpath such as GitHub Pages.
+## Deploying
+
+The Vercel project `alexius-lee` is connected to this GitHub repo, so pushing
+to `main` builds and publishes automatically:
+
+```bash
+git add -A && git commit -m "your message" && git push
+```
+
+To publish without a commit, `vercel --prod --yes` deploys the working tree.
+
+Share the production alias, `alexius-lee.vercel.app`. The per-deployment URLs
+that Vercel prints (`alexius-<hash>-axlxius-projects.vercel.app`) sit behind
+Vercel's login wall and will not open for anyone else.
+
+`vite.config.js` sets `base: './'`, so the build also works from a subpath such
+as GitHub Pages if you ever move it.
+
+`resume/` is gitignored. It holds a personal document with a phone number in
+it, which does not belong in a public repo.
 
 ## Editing your content
 
@@ -21,7 +41,7 @@ content file to keep in sync — edit the markup directly.
 | --- | --- |
 | Name | `<title>`, `.wordmark`, the `h1` in `#intro` |
 | Description meta tag | `<head>` |
-| Projects | the five `.work-item` entries in `#work` |
+| Projects | the six `.work-item` entries in `#work` |
 | Roles | the two `.role` entries in `#experience` |
 | Skills | the four groups in `#stack` |
 | Education, certifications | `.credentials` in `#stack` |
