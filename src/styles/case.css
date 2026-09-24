@@ -1,0 +1,191 @@
+/* ==========================================================================
+   Project write-ups (/work/*). Same tokens as the home page; the layout
+   borrows the .role grid — a label column against a reading column.
+   ========================================================================== */
+
+.chrome {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  top: clamp(1rem, 2.5vw, 2rem);
+  right: var(--gutter);
+  left: var(--gutter);
+}
+
+.wordmark {
+  font-size: var(--size-meta);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.toggle {
+  appearance: none;
+  background: transparent;
+  border: var(--rule);
+  border-radius: 999px;
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--size-meta);
+  font-weight: 500;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease), background-color 0.3s var(--ease);
+}
+
+.toggle:hover {
+  background: var(--ink-10);
+  border-color: var(--ink-45);
+}
+
+.case {
+  padding: clamp(7rem, 18vh, 11rem) var(--gutter) clamp(4rem, 10vh, 7rem);
+}
+
+.case-back {
+  display: inline-block;
+  margin-bottom: clamp(2rem, 5vh, 3rem);
+  font-size: var(--size-meta);
+  font-weight: 500;
+  color: var(--ink-45);
+  transition: color 0.3s var(--ease);
+}
+
+.case-back:hover,
+.case-back:focus-visible {
+  color: var(--ink);
+}
+
+.bleed {
+  width: calc(100% + var(--gutter) * 2);
+  margin-inline-start: calc(var(--gutter) * -1);
+  padding-inline-start: var(--gutter);
+  overflow: hidden;
+}
+
+.case .lead {
+  margin-top: clamp(1.75rem, 4vh, 2.5rem);
+}
+
+.case-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 3rem;
+  margin: clamp(2rem, 6vh, 3.5rem) 0 0;
+}
+
+.case-facts dt {
+  font-size: var(--size-meta);
+  font-weight: 500;
+  color: var(--ink-45);
+}
+
+.case-facts dd {
+  margin: 0.15rem 0 0;
+}
+
+.case-body {
+  max-width: 62rem;
+  margin-top: clamp(3rem, 8vh, 5rem);
+}
+
+.case-part {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 0.5rem 2rem;
+  padding-block: clamp(1.5rem, 3.5vh, 2.25rem);
+  border-top: var(--rule);
+}
+
+/* Everything after the heading stays in the reading column, however many
+   paragraphs a part has. */
+.case-part > * + * {
+  grid-column: 2;
+}
+
+.case-part h2 {
+  font-size: var(--size-body);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.6;
+}
+
+.case-part ul li {
+  position: relative;
+  padding-left: 1.25rem;
+  max-width: var(--measure);
+  color: var(--ink-70);
+}
+
+.case-part ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.8em;
+  width: 0.6rem;
+  border-top: 1px solid var(--ink-45);
+}
+
+.case-part ul li + li {
+  margin-top: 0.75rem;
+}
+
+.case-part strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+@media (max-width: 760px) {
+  .case-part {
+    grid-template-columns: 1fr;
+  }
+
+  .case-part > * + * {
+    grid-column: 1;
+  }
+}
+
+.case-next {
+  display: block;
+  max-width: 62rem;
+  margin-top: clamp(3rem, 8vh, 5rem);
+  padding-top: 1.25rem;
+  border-top: var(--rule);
+}
+
+.case-next .meta {
+  display: block;
+}
+
+.case-next-name {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: clamp(1.35rem, 2.6vw, 2.25rem);
+  font-weight: 300;
+  font-stretch: 112%;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  transition: padding-inline-start 0.45s var(--ease);
+}
+
+.case-next:hover .case-next-name,
+.case-next:focus-visible .case-next-name {
+  padding-inline-start: 1.1rem;
+}
+
+.case-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  max-width: 62rem;
+  margin-top: clamp(3rem, 8vh, 5rem);
+  padding-top: 1.25rem;
+  border-top: var(--rule);
+}
+
+.case-foot a {
+  border-bottom: 1px solid var(--ink-45);
+}

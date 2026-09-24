@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    rect { fill: #000; }
+    path { stroke: #fff; }
+    @media (prefers-color-scheme: dark) {
+      rect { fill: #fff; }
+      path { stroke: #000; }
+    }
+  </style>
+  <rect width="64" height="64" rx="12" />
+  <!-- "AL" monogram drawn as strokes so it renders the same without web fonts -->
+  <path d="M10 48 L21 16 L32 48 M14.5 36 H27.5 M40 16 V48 H54" fill="none" stroke-width="4.5" stroke-linecap="square" stroke-linejoin="miter" />
+</svg>

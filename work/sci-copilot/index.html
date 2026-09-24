@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>SCI Agent Copilot — Alexius Lee</title>
+    <meta
+      name="description"
+      content="A copilot for insurance agents: policy search, MAS disclosure checks and document drift detection, shipped as an installable PWA. Built with React, Vite and Supabase."
+    />
+    <link rel="canonical" href="https://alexius-lee.vercel.app/work/sci-copilot/" />
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Alexius Lee" />
+    <meta property="og:title" content="SCI Agent Copilot — Alexius Lee" />
+    <meta
+      property="og:description"
+      content="A copilot for insurance agents: policy search, MAS disclosure checks and document drift detection."
+    />
+    <meta property="og:url" content="https://alexius-lee.vercel.app/work/sci-copilot/" />
+    <meta property="og:image" content="https://alexius-lee.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Same pre-paint theme resolution as the home page. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('portfolio-theme');
+          var dark =
+            stored === 'dark' ||
+            (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <header class="chrome">
+      <a class="wordmark" href="../../">Alexius Lee</a>
+      <button class="toggle" type="button" data-theme-toggle aria-pressed="false">
+        <span data-theme-label>Dark</span>
+      </button>
+    </header>
+
+    <main class="case">
+      <a class="case-back" href="../../#work">&larr; All work</a>
+
+      <div class="bleed">
+        <h1 class="title" data-reveal><span>SCI Agent Copilot</span></h1>
+      </div>
+
+      <p class="lead">
+        A copilot for insurance agents that searches the policy base, checks
+        messages against MAS disclosure rules, and flags where two versions of
+        a document disagree.
+      </p>
+
+      <dl class="case-facts">
+        <div><dt>Context</dt><dd>Business Innovation Project, Nanyang Polytechnic</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+        <div><dt>Stack</dt><dd>React, Vite, Supabase, Capacitor</dd></div>
+      </dl>
+
+      <div class="case-body">
+        <section class="case-part">
+          <h2>The problem</h2>
+          <p class="body">
+            Insurance agents were digging through policy documents by hand to
+            answer client questions. That is slow, and the cost of a mistake is
+            real: a client message that misses a compliance rule can cost the
+            firm money.
+          </p>
+        </section>
+
+        <section class="case-part">
+          <h2>What I built</h2>
+          <ul>
+            <li>
+              <strong>Knowledge retrieval.</strong> Search across the policy
+              base, so an agent finds the right clause without opening every
+              document.
+            </li>
+            <li>
+              <strong>Compliance checks.</strong> Messages are checked against
+              MAS disclosure rules before they reach a client.
+            </li>
+            <li>
+              <strong>Document drift detection.</strong> When two versions of a
+              document disagree, the copilot flags where.
+            </li>
+            <li>
+              Shipped as an installable PWA with a service worker, so agents
+              can add it to their home screen like a native app.
+            </li>
+          </ul>
+        </section>
+
+        <section class="case-part">
+          <h2>A hole I closed</h2>
+          <p class="body">
+            While building sign-up I found that anyone could register as a
+            policy handler with full write access. I moved role creation to a
+            locked-down server-side flow, so a role can only be granted, never
+            claimed at sign-up.
+          </p>
+          <p class="body">
+            I also made the audit trail append-only. Records cannot be edited
+            after the fact, which is the point of an audit trail in a regulated
+            business.
+          </p>
+        </section>
+      </div>
+
+      <a class="case-next" href="../portfolio-dashboard/">
+        <span class="meta">Next project</span>
+        <span class="case-next-name">Portfolio Dashboard</span>
+      </a>
+
+      <footer class="case-foot">
+        <span class="meta">Alexius Lee, Singapore</span>
+        <a class="meta" href="mailto:alex888ius@gmail.com">alex888ius@gmail.com</a>
+      </footer>
+    </main>
+
+    <script type="module" src="../../src/case.js"></script>
+  </body>
+</html>

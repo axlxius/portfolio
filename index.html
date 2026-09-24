@@ -9,6 +9,66 @@
       name="description"
       content="Alexius Lee — business and financial technology student in Singapore, interning as a product manager at GovTech. Selected projects, experience and contact."
     />
+    <link rel="canonical" href="https://alexius-lee.vercel.app/" />
+
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+
+    <!-- Link previews (LinkedIn, WhatsApp, Slack, X). Scrapers need absolute
+         URLs. public/og-image.png is 1200x630; regenerate it if the title or
+         role changes. -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="Alexius Lee" />
+    <meta property="og:title" content="Alexius Lee — Business and Financial Technology" />
+    <meta
+      property="og:description"
+      content="Business and financial technology student in Singapore, interning as a product manager at GovTech. Selected projects, experience and contact."
+    />
+    <meta property="og:url" content="https://alexius-lee.vercel.app/" />
+    <meta property="og:image" content="https://alexius-lee.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Alexius Lee — business and financial technology, product management intern at GovTech" />
+    <meta property="og:locale" content="en_SG" />
+    <meta property="profile:first_name" content="Alexius" />
+    <meta property="profile:last_name" content="Lee" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Structured data: tells search engines this page is about one person
+         and ties the GitHub and LinkedIn profiles to it. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Alexius Lee",
+        "url": "https://alexius-lee.vercel.app/",
+        "image": "https://alexius-lee.vercel.app/og-image.png",
+        "jobTitle": "Product Management Intern",
+        "worksFor": {
+          "@type": "GovernmentOrganization",
+          "name": "GovTech Singapore",
+          "url": "https://www.tech.gov.sg/"
+        },
+        "alumniOf": {
+          "@type": "CollegeOrUniversity",
+          "name": "Nanyang Polytechnic",
+          "url": "https://www.nyp.edu.sg/"
+        },
+        "address": { "@type": "PostalAddress", "addressCountry": "SG" },
+        "knowsAbout": [
+          "Financial technology",
+          "Product management",
+          "Data analysis",
+          "Data visualisation",
+          "Python",
+          "JavaScript"
+        ],
+        "sameAs": [
+          "https://github.com/axlxius",
+          "https://www.linkedin.com/in/alexius-lee-79461b307/"
+        ]
+      }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -54,11 +114,10 @@
 
         <div class="column" style="margin-top: clamp(1.5rem, 4vh, 2.5rem)">
           <p class="lead">
-            Tech enthusiast with a foundation in ICT and a passion for solving
-            problems through innovation. Currently diving into Business and
-            Financial Technology to bridge the gap between tech and finance.
-            Always eager to learn, collaborate, and create impactful solutions
-            that drive the future of digital transformation.
+            Business and financial technology student at Nanyang Polytechnic,
+            currently a product management intern at GovTech. I build data
+            dashboards and full-stack tools for finance and insurance, and I am
+            looking for product and fintech roles.
           </p>
 
           <div class="intro-meta">
@@ -79,7 +138,7 @@
 
         <ul class="work-list">
           <li class="work-item">
-            <a class="work-link" href="#intro" data-strand="0.05">
+            <a class="work-link" href="https://github.com/axlxius/portfolio" rel="noreferrer" data-strand="0.05">
               <span class="work-name">This Site</span>
               <span class="work-note">
                 The site you are on. One Three.js object that reforms into a
@@ -90,8 +149,8 @@
           </li>
 
           <li class="work-item">
-            <a class="work-link" href="#work" data-strand="0.22">
-              <span class="work-name">Portfolio Analytics</span>
+            <a class="work-link" href="./work/portfolio-dashboard/" data-strand="0.22">
+              <span class="work-name">Portfolio Dashboard</span>
               <span class="work-note">
                 Streamlit dashboard tracking a Singapore multi-asset book, with
                 live broker pricing and labelled fallbacks.
@@ -101,7 +160,7 @@
           </li>
 
           <li class="work-item">
-            <a class="work-link" href="#work" data-strand="0.38">
+            <a class="work-link" href="./work/sci-copilot/" data-strand="0.38">
               <span class="work-name">SCI Copilot</span>
               <span class="work-note">
                 Copilot for insurance agents: knowledge retrieval, compliance
@@ -112,7 +171,7 @@
           </li>
 
           <li class="work-item">
-            <a class="work-link" href="#work" data-strand="0.55">
+            <a class="work-link" href="./work/growcerysg/" data-strand="0.55">
               <span class="work-name">GrowcerySG</span>
               <span class="work-note">
                 Urban farming marketplace with produce trading, carbon footprint
@@ -123,7 +182,7 @@
           </li>
 
           <li class="work-item">
-            <a class="work-link" href="#work" data-strand="0.72">
+            <a class="work-link" href="./work/housing-and-fertility/" data-strand="0.72">
               <span class="work-name">Housing and Fertility</span>
               <span class="work-note">
                 Tableau study linking HDB resale prices and median income to
@@ -134,14 +193,15 @@
           </li>
 
           <li class="work-item">
-            <a class="work-link" href="#work" data-strand="0.89">
+            <!-- No write-up or public repo yet, so this row is not a link. -->
+            <div class="work-link work-link--static" data-strand="0.89">
               <span class="work-name">pay2live</span>
               <span class="work-note">
                 Modular web app for clinic operations, with scheduling, WhatsApp
                 OTP and real-time notifications.
               </span>
               <span class="meta work-year">2025</span>
-            </a>
+            </div>
           </li>
         </ul>
       </section>
@@ -157,6 +217,12 @@
             <span class="meta">2026 to now</span>
             <div>
               <h3 class="role-title">Product Management Intern, GovTech</h3>
+              <p class="role-body">
+                Carry out IT audit and compliance checks across internal
+                systems. Design screens in Figma, build the front-end features,
+                and run user acceptance testing, passing findings back to
+                engineering.
+              </p>
             </div>
           </article>
 
@@ -167,9 +233,24 @@
                 Key Account Manager, SME Sales, Veritas Organisation
               </h3>
               <p class="role-body">
-                Managed SME energy clients end to end, from sourcing leads
-                through outreach and email campaigns to client acquisition and
-                service satisfaction. Ran residential roadshows for the brand.
+                Owned a portfolio of SME energy clients from first call to
+                renewal, with consistently high conversion. Ran a heavy
+                calendar of residential roadshows and cold outreach campaigns
+                to keep the pipeline full.
+              </p>
+            </div>
+          </article>
+
+          <article class="role">
+            <span class="meta">2023 to 2024</span>
+            <div>
+              <h3 class="role-title">
+                Receptionist, FriendsGolf Singapore. Usher, National Gallery
+                Singapore
+              </h3>
+              <p class="role-body">
+                Front desk, payments, visitor guidance and event setup, worked
+                alongside full-time study.
               </p>
             </div>
           </article>
@@ -191,8 +272,8 @@
               <li>JavaScript</li>
               <li>React</li>
               <li>C# and ASP.NET</li>
-              <li>HTML and CSS</li>
-              <li>Flask and Jinja</li>
+              <li>Flask and Streamlit</li>
+              <li>HTML, CSS and SQL</li>
             </ul>
           </div>
 
@@ -200,6 +281,7 @@
             <h3 class="group-name">Data</h3>
             <ul class="group-list">
               <li>Tableau</li>
+              <li>pandas</li>
               <li>Business statistics</li>
               <li>Data analysis</li>
               <li>Data visualisation</li>
@@ -209,21 +291,23 @@
           <div>
             <h3 class="group-name">Tools</h3>
             <ul class="group-list">
-              <li>Vite</li>
+              <li>Figma</li>
+              <li>Git</li>
               <li>Supabase</li>
               <li>MongoDB and SQL Server</li>
+              <li>Vite and Capacitor</li>
               <li>Tailwind CSS</li>
-              <li>jQuery</li>
             </ul>
           </div>
 
           <div>
-            <h3 class="group-name">Business</h3>
+            <h3 class="group-name">Product and business</h3>
             <ul class="group-list">
-              <li>Project delivery</li>
+              <li>User acceptance testing</li>
+              <li>IT audit and compliance</li>
               <li>Key account management</li>
               <li>Lead sourcing</li>
-              <li>Client communication</li>
+              <li>Sales presentations</li>
             </ul>
           </div>
         </div>
@@ -234,7 +318,7 @@
             <ul class="group-list group-list--wide">
               <li>
                 Diploma in Business and Financial Technology, Nanyang
-                Polytechnic
+                Polytechnic. Director's List, Year 3 Semester 1
               </li>
               <li>Common ICT Programme, Nanyang Polytechnic</li>
               <li>O Levels, Beatty Secondary School</li>

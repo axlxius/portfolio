@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>Portfolio Dashboard — Alexius Lee</title>
+    <meta
+      name="description"
+      content="A Streamlit dashboard for a Singapore multi-asset portfolio across ETFs, SGX blue chips, S-REITs and US stocks, with live broker pricing and labelled fallbacks."
+    />
+    <link rel="canonical" href="https://alexius-lee.vercel.app/work/portfolio-dashboard/" />
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Alexius Lee" />
+    <meta property="og:title" content="Portfolio Dashboard — Alexius Lee" />
+    <meta
+      property="og:description"
+      content="One view of a Singapore portfolio across ETFs, SGX blue chips, S-REITs and US stocks, with live broker pricing and labelled fallbacks."
+    />
+    <meta property="og:url" content="https://alexius-lee.vercel.app/work/portfolio-dashboard/" />
+    <meta property="og:image" content="https://alexius-lee.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Same pre-paint theme resolution as the home page. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('portfolio-theme');
+          var dark =
+            stored === 'dark' ||
+            (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <header class="chrome">
+      <a class="wordmark" href="../../">Alexius Lee</a>
+      <button class="toggle" type="button" data-theme-toggle aria-pressed="false">
+        <span data-theme-label>Dark</span>
+      </button>
+    </header>
+
+    <main class="case">
+      <a class="case-back" href="../../#work">&larr; All work</a>
+
+      <div class="bleed">
+        <h1 class="title" data-reveal><span>Portfolio Dashboard</span></h1>
+      </div>
+
+      <p class="lead">
+        One view of a Singapore portfolio split across ETFs, SGX blue chips,
+        S-REITs and US stocks, instead of checking four places.
+      </p>
+
+      <dl class="case-facts">
+        <div><dt>Context</dt><dd>Personal project</dd></div>
+        <div><dt>Year</dt><dd>2026</dd></div>
+        <div><dt>Stack</dt><dd>Python, Streamlit, pandas, Moomoo OpenD API</dd></div>
+      </dl>
+
+      <div class="case-body">
+        <section class="case-part">
+          <h2>The problem</h2>
+          <p class="body">
+            The portfolio spans four kinds of holding, and seeing all of it
+            meant checking four places. I wanted a single view of the whole
+            book.
+          </p>
+        </section>
+
+        <section class="case-part">
+          <h2>What I built</h2>
+          <ul>
+            <li>
+              A Streamlit dashboard that either reads a broker statement
+              export or pulls positions live from the account through the
+              Moomoo OpenD API.
+            </li>
+            <li>
+              All four asset classes in one view, with the data handled in
+              pandas.
+            </li>
+          </ul>
+        </section>
+
+        <section class="case-part">
+          <h2>Prices you can trust</h2>
+          <p class="body">
+            Live prices are not always available, so they fall back through
+            three tiers: the broker feed, then an intraday quote, then the
+            daily close.
+          </p>
+          <p class="body">
+            Every row shows which tier priced it and how old the quote is. A
+            dashboard that quietly shows a stale price as live is worse than
+            one that tells you it is stale, so a delayed price is never
+            mistaken for a live one.
+          </p>
+        </section>
+      </div>
+
+      <a class="case-next" href="../housing-and-fertility/">
+        <span class="meta">Next project</span>
+        <span class="case-next-name">Housing and Fertility</span>
+      </a>
+
+      <footer class="case-foot">
+        <span class="meta">Alexius Lee, Singapore</span>
+        <a class="meta" href="mailto:alex888ius@gmail.com">alex888ius@gmail.com</a>
+      </footer>
+    </main>
+
+    <script type="module" src="../../src/case.js"></script>
+  </body>
+</html>

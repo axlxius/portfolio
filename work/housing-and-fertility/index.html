@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>Housing Costs and Fertility in Singapore — Alexius Lee</title>
+    <meta
+      name="description"
+      content="A Tableau study of HDB resale prices, median income and Singapore's falling fertility rate, with a lagged comparison across age groups and flat types."
+    />
+    <link rel="canonical" href="https://alexius-lee.vercel.app/work/housing-and-fertility/" />
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Alexius Lee" />
+    <meta property="og:title" content="Housing Costs and Fertility in Singapore — Alexius Lee" />
+    <meta
+      property="og:description"
+      content="A Tableau study of HDB resale prices, median income and Singapore's falling fertility rate."
+    />
+    <meta property="og:url" content="https://alexius-lee.vercel.app/work/housing-and-fertility/" />
+    <meta property="og:image" content="https://alexius-lee.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Same pre-paint theme resolution as the home page. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('portfolio-theme');
+          var dark =
+            stored === 'dark' ||
+            (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <header class="chrome">
+      <a class="wordmark" href="../../">Alexius Lee</a>
+      <button class="toggle" type="button" data-theme-toggle aria-pressed="false">
+        <span data-theme-label>Dark</span>
+      </button>
+    </header>
+
+    <main class="case">
+      <a class="case-back" href="../../#work">&larr; All work</a>
+
+      <div class="bleed">
+        <h1 class="title" data-reveal><span>Housing and Fertility</span></h1>
+      </div>
+
+      <p class="lead">
+        Singapore's birth rate keeps falling while housing keeps getting more
+        expensive. This study asks how closely the two track each other.
+      </p>
+
+      <dl class="case-facts">
+        <div><dt>Context</dt><dd>Business Analytics Project, Nanyang Polytechnic</dd></div>
+        <div><dt>Year</dt><dd>2025</dd></div>
+        <div><dt>Tool</dt><dd>Tableau</dd></div>
+      </dl>
+
+      <div class="case-body">
+        <section class="case-part">
+          <h2>The data</h2>
+          <ul>
+            <li>HDB resale prices and the HDB resale price index.</li>
+            <li>Median income by age group.</li>
+            <li>The national total fertility rate.</li>
+          </ul>
+        </section>
+
+        <section class="case-part">
+          <h2>The method</h2>
+          <p class="body">
+            Housing costs today affect decisions about children a few years
+            later, so I ran a lagged comparison rather than lining the years
+            up directly. The analysis focuses on the 25 to 29 and 25 to 34 age
+            groups, the years when most people are buying a first flat and
+            starting a family.
+          </p>
+          <p class="body">
+            I then split the housing side by flat type, floor area, storey
+            range and lease remaining, to see which parts of the market moved
+            most.
+          </p>
+        </section>
+
+        <section class="case-part">
+          <h2>The output</h2>
+          <p class="body">
+            An interactive Tableau dashboard story that traces how housing has
+            changed across the years and across age groups, set against the
+            fertility rate.
+          </p>
+        </section>
+      </div>
+
+      <a class="case-next" href="../growcerysg/">
+        <span class="meta">Next project</span>
+        <span class="case-next-name">GrowcerySG</span>
+      </a>
+
+      <footer class="case-foot">
+        <span class="meta">Alexius Lee, Singapore</span>
+        <a class="meta" href="mailto:alex888ius@gmail.com">alex888ius@gmail.com</a>
+      </footer>
+    </main>
+
+    <script type="module" src="../../src/case.js"></script>
+  </body>
+</html>

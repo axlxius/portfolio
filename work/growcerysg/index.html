@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <title>GrowcerySG — Alexius Lee</title>
+    <meta
+      name="description"
+      content="An urban farming marketplace for Singapore with peer-to-peer produce trading, a carbon footprint tracker and gamified sustainability tasks. Built with C#, ASP.NET and SQL Server."
+    />
+    <link rel="canonical" href="https://alexius-lee.vercel.app/work/growcerysg/" />
+
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="Alexius Lee" />
+    <meta property="og:title" content="GrowcerySG — Alexius Lee" />
+    <meta
+      property="og:description"
+      content="An urban farming marketplace for Singapore with produce trading, carbon tracking and gamified sustainability tasks."
+    />
+    <meta property="og:url" content="https://alexius-lee.vercel.app/work/growcerysg/" />
+    <meta property="og:image" content="https://alexius-lee.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Same pre-paint theme resolution as the home page. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('portfolio-theme');
+          var dark =
+            stored === 'dark' ||
+            (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <header class="chrome">
+      <a class="wordmark" href="../../">Alexius Lee</a>
+      <button class="toggle" type="button" data-theme-toggle aria-pressed="false">
+        <span data-theme-label>Dark</span>
+      </button>
+    </header>
+
+    <main class="case">
+      <a class="case-back" href="../../#work">&larr; All work</a>
+
+      <div class="bleed">
+        <h1 class="title" data-reveal><span>GrowcerySG</span></h1>
+      </div>
+
+      <p class="lead">
+        A marketplace to get more people in Singapore growing and buying food
+        locally, with a carbon tracker that shows what buying local saves.
+      </p>
+
+      <dl class="case-facts">
+        <div><dt>Context</dt><dd>Business Application Development, Nanyang Polytechnic (team project)</dd></div>
+        <div><dt>Year</dt><dd>2025 to 2026</dd></div>
+        <div><dt>Stack</dt><dd>C#, ASP.NET Web Forms, SQL Server, JavaScript</dd></div>
+      </dl>
+
+      <div class="case-body">
+        <section class="case-part">
+          <h2>My part</h2>
+          <ul>
+            <li>
+              <strong>Marketplace and trading.</strong> The produce
+              marketplace, plus the peer-to-peer side where growers trade with
+              each other directly.
+            </li>
+            <li>
+              <strong>Engagement.</strong> Quizzes, achievements, leaderboards
+              and rewards, to give people a reason to come back.
+            </li>
+          </ul>
+        </section>
+
+        <section class="case-part">
+          <h2>The carbon tracker</h2>
+          <p class="body">
+            Most of Singapore's food is imported, so buying local has a
+            measurable effect on emissions. The tracker works out how much CO2
+            a purchase saves, using published transport emission factors and
+            real import distances into Singapore, rather than a flat
+            estimate.
+          </p>
+        </section>
+      </div>
+
+      <a class="case-next" href="../sci-copilot/">
+        <span class="meta">Next project</span>
+        <span class="case-next-name">SCI Agent Copilot</span>
+      </a>
+
+      <footer class="case-foot">
+        <span class="meta">Alexius Lee, Singapore</span>
+        <a class="meta" href="mailto:alex888ius@gmail.com">alex888ius@gmail.com</a>
+      </footer>
+    </main>
+
+    <script type="module" src="../../src/case.js"></script>
+  </body>
+</html>

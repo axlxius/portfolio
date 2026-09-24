@@ -10,3 +10,4 @@ dist
 # Personal documents. Not part of the site, and the resume carries a phone
 # number that should not end up in a public repo.
 resume/
+.playwright-mcp/

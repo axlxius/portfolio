@@ -119,8 +119,10 @@
 
 /* Display type is set flush left and allowed to run past the right edge.
    The clip is intentional — the line is a held note, not a contained label. */
+/* Sized from the section, not 100vw: on Windows 100vw includes the vertical
+   scrollbar, which made the page scroll sideways by the scrollbar's width. */
 .bleed {
-  width: 100vw;
+  width: calc(100% + var(--gutter) * 2);
   margin-inline-start: calc(var(--gutter) * -1);
   padding-inline-start: var(--gutter);
   overflow: hidden;
@@ -182,6 +184,12 @@
 .work-link:hover,
 .work-link:focus-visible {
   padding-inline-start: 1.1rem;
+}
+
+/* A row with nowhere to go still lights its strands, but does not shift as
+   if it were clickable. */
+.work-link--static:hover {
+  padding-inline-start: 0;
 }
 
 .work-name {
