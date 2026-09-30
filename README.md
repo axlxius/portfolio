@@ -83,10 +83,13 @@ public on deploy. Use an updated copy and decide about the phone number first.
 
 Copy a `.work-item` block and give it a `data-strand` value between `0` and
 `1`. Each row owns one hoop of the Work form, stacked in list order, and
-hovering or focusing the row lights exactly that hoop. The number of hoops
-follows the number of rows automatically. Space the values evenly (for six
-rows: 0.05 / 0.22 / 0.38 / 0.55 / 0.72 / 0.89); the hover edge is derived from
-the smallest gap, so bunched values give thinner hoops.
+hovering or focusing the row lights exactly that hoop: every strand carries
+its hoop's index, so the lit set is the hoop whatever the spacing. The number
+of hoops follows the number of rows, and the camera backs off so the whole
+stack stays on screen. Strands join the hoop whose value is nearest their
+seed, so spacing the values evenly (for six rows: 0.05 / 0.22 / 0.38 / 0.55 /
+0.72 / 0.89) keeps the hoops similarly dense. Give every row a different
+value: two rows with the same value share one hoop.
 
 ## How the 3D works
 
@@ -134,13 +137,15 @@ exactly when section *N* is centred, regardless of how tall the sections are.
 | Camera distance and height per section | `CAMERA_Z` / `CAMERA_Y` in `src/scene/tracks.js` |
 | Morph spread, drift, settling per section | `STAGGER` / `NOISE` / `SETTLE` in `src/scene/tracks.js` |
 | Width kept in frame on narrow screens | `FIT_WIDTH` in `src/scene/tracks.js` |
+| Work hoop stack kept in frame vertically | `FIT_HEIGHT` in `src/scene/tracks.js` |
 | Hoop and braid proportions | `HOOP` / `BRAID` in `src/scene/shapes.js` |
 | The five forms themselves | the builder functions in `src/scene/shapes.js` |
 | Corner dots | `src/scene/CornerDots.js`, placement in `src/styles/layout.css` |
 
 `npm test` runs the Node tests in `tests/`. They check the forms (including
-that the Intro and Contact forms have not changed), the hover band maths and
-the camera fitting.
+that the Intro and Contact forms have not changed), that each strand's hover
+index matches the hoop it is drawn on, and that the camera fitting keeps the
+hoops on screen.
 
 Adding or removing a builder in `shapes.js` is enough to change the number of
 states — `STATE_COUNT`, the shader attributes and the blend are all generated

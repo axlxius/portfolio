@@ -22,6 +22,10 @@ export const NOISE = [0.12, 0.03, 0.04, 0.03, 0.12];
 // screens the camera backs off until it fits. 0 = free to run off the edges.
 export const FIT_WIDTH = [0, 1.65, 1.25, 0, 0];
 
+// Weight of the vertical fit for the Work hoop stack (1 = the whole stack of
+// project hoops must stay on screen). Only Work has a stack.
+export const FIT_HEIGHT = [0, 1, 0, 0, 0];
+
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
 /** Sample a per-state track at a fractional progress value. */
@@ -30,6 +34,18 @@ export function sampleTrack(track, progress) {
   const i = Math.floor(p);
   const j = Math.min(i + 1, track.length - 1);
   return track[i] + (track[j] - track[i]) * (p - i);
+}
+
+/**
+ * Camera distance that keeps a stack `halfHeight` tall (about its centre) in
+ * view, measured at the stack's nearest face (`depth` in front of centre) and
+ * allowing for the camera sitting `camY` above it. The 0.9 leaves headroom for
+ * the group's tilt and drift. Never closer than `baseZ`.
+ */
+export function fitCameraZHeight(baseZ, halfHeight, depth, camY, fovDeg) {
+  if (!(halfHeight > 0)) return baseZ;
+  const halfTan = Math.tan((fovDeg * Math.PI) / 360);
+  return Math.max(baseZ, (halfHeight + Math.abs(camY)) / (halfTan * 0.9) + depth);
 }
 
 /**

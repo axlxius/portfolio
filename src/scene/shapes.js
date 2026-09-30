@@ -60,6 +60,11 @@ function torusKnot(out, strands, len, rand) {
 // its seed, so hovering a row lights exactly that hoop.
 export const HOOP = { radius: 1.4, tube: 0.11, gap: 0.64 };
 
+/** Half the height of a stack of `count` hoops, centre to outer tube edge. */
+export function hoopStackHalfHeight(count) {
+  return ((Math.max(count, 1) - 1) / 2) * HOOP.gap + HOOP.tube;
+}
+
 // Which hoop each strand belongs to, its slot within that hoop, and how many
 // strands each hoop has. Shared by the geometry and the hover index so the two
 // can never disagree.

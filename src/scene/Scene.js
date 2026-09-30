@@ -19,15 +19,19 @@ import {
   buildSeeds,
   buildSegmentIndices,
   buildStates,
+  HOOP,
+  hoopStackHalfHeight,
 } from './shapes.js';
 import {
   CAMERA_Y,
   CAMERA_Z,
+  FIT_HEIGHT,
   FIT_WIDTH,
   NOISE,
   SETTLE,
   STAGGER,
   fitCameraZ,
+  fitCameraZHeight,
   sampleTrack,
 } from './tracks.js';
 
@@ -55,6 +59,7 @@ export default class Scene {
     this.canvas = canvas;
     this.reducedMotion = reducedMotion;
     this.projectBands = projectBands;
+    this.stackHalfHeight = hoopStackHalfHeight(projectBands.length);
 
     this.renderer = new WebGLRenderer({
       canvas,
@@ -294,14 +299,26 @@ export default class Scene {
     this.group.rotation.x = Math.sin(this.progress * 0.8) * 0.16;
 
     const baseZ = sampleTrack(CAMERA_Z, this.progress) * this.frameScale;
-    const z = fitCameraZ(
-      baseZ,
-      sampleTrack(FIT_WIDTH, this.progress),
-      this.camera.fov,
-      this.camera.aspect
+    const camY = sampleTrack(CAMERA_Y, this.progress);
+    // Back off until the key width fits, and the whole Work hoop stack fits
+    // vertically, however many projects there are.
+    const z = Math.max(
+      fitCameraZ(
+        baseZ,
+        sampleTrack(FIT_WIDTH, this.progress),
+        this.camera.fov,
+        this.camera.aspect
+      ),
+      fitCameraZHeight(
+        baseZ,
+        sampleTrack(FIT_HEIGHT, this.progress) * this.stackHalfHeight,
+        HOOP.radius + HOOP.tube,
+        camY,
+        this.camera.fov
+      )
     );
     this.camera.position.z = z;
-    this.camera.position.y = sampleTrack(CAMERA_Y, this.progress);
+    this.camera.position.y = camY;
     // The extra distance is only for framing: keep depth fog from dimming it.
     this.#setUniform('uDepthShift', z - baseZ);
     this.camera.lookAt(0, this.camera.position.y * 0.35, 0);
