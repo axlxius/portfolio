@@ -5,6 +5,8 @@
 // segments connecting consecutive points survive the morph and read as threads
 // being rewoven rather than particles teleporting.
 
+import { nearestBand } from './bands.js';
+
 const TAU = Math.PI * 2;
 
 // Deterministic PRNG so the composition is identical on every load.
@@ -53,95 +55,110 @@ function torusKnot(out, strands, len, rand) {
   }
 }
 
-// State 1 — Work. Strands lie flat as a mesh plane receding to a horizon.
-function recedingPlane(out, strands, len, rand) {
+// State 1 — Work. One hoop per project, stacked top to bottom in list order.
+// A strand joins the hoop of the project whose data-strand value is nearest
+// its seed, so hovering a row lights exactly that hoop.
+export const HOOP = { radius: 1.4, tube: 0.11, gap: 0.64 };
+
+function projectHoops(out, strands, len, _rand, { projectBands = [] } = {}) {
+  const bands = projectBands.length ? projectBands : [0.5];
+  const seeds = buildSeeds(strands, len);
+
+  const hoopOf = new Array(strands);
+  const slot = new Array(strands);
+  const counts = new Array(bands.length).fill(0);
   for (let s = 0; s < strands; s++) {
-    const rowU = s / (strands - 1);
-    const z = -7.5 + rowU * 9.5;
-    const jitter = (rand() - 0.5) * 0.12;
+    const k = nearestBand(seeds[s * len], bands);
+    hoopOf[s] = k;
+    slot[s] = counts[k]++;
+  }
+
+  for (let s = 0; s < strands; s++) {
+    const k = hoopOf[s];
+    const y0 = ((bands.length - 1) / 2 - k) * HOOP.gap;
+    // Where this strand sits on the hoop's cross-section.
+    const ta = (slot[s] / counts[k]) * TAU;
+    const r = HOOP.radius + Math.cos(ta) * HOOP.tube;
+    const y = y0 + Math.sin(ta) * HOOP.tube;
 
     for (let l = 0; l < len; l++) {
-      const u = l / (len - 1);
-      const x = (u - 0.5) * 11;
-      const y =
-        -1.45 +
-        Math.sin(x * 0.85 + z * 0.5) * 0.28 +
-        Math.sin(z * 1.3) * 0.18 +
-        jitter;
-
+      // Each strand is an arc at exactly the angles it has in the braid, so
+      // Work -> Experience is a vertical stretch rather than points crossing
+      // the shape. Overlapping arcs close each hoop.
+      const a = braidAngle(s, strands, l / (len - 1));
       const i = (s * len + l) * 3;
-      out[i] = x;
+      out[i] = Math.cos(a) * r;
       out[i + 1] = y;
-      out[i + 2] = z + jitter;
+      out[i + 2] = Math.sin(a) * r;
     }
   }
 }
 
-// State 2 — Experience. Strands wind into a single twisted column.
-function helixColumn(out, strands, len, rand) {
-  const GOLDEN = Math.PI * (3 - Math.sqrt(5));
+// State 2 — Experience. Every strand is the same helix, evenly phased, with
+// alternate strands twisting the other way, so the column reads as woven.
+export const BRAID = { radius: 1.05, turns: 0.6, halfHeight: 3.4, waist: 0.22 };
 
+export function braidAngle(s, strands, u) {
+  const dir = s % 2 === 0 ? 1 : -1;
+  return (s / strands) * TAU + dir * u * TAU * BRAID.turns;
+}
+
+function braidColumn(out, strands, len) {
   for (let s = 0; s < strands; s++) {
-    const phase = s * GOLDEN;
-    const radius = 0.85 + (s / strands) * 0.55 + rand() * 0.14;
-    const turns = 1.15 + rand() * 0.5;
-    const yTop = 3.4 + rand() * 0.3;
-
     for (let l = 0; l < len; l++) {
       const u = l / (len - 1);
-      const a = phase + u * TAU * turns;
-      const taper = 1 - Math.abs(u - 0.5) * 0.35; // pinch the ends
+      const a = braidAngle(s, strands, u);
+      const r = BRAID.radius * (1 - Math.sin(u * Math.PI) * BRAID.waist);
 
       const i = (s * len + l) * 3;
-      out[i] = Math.cos(a) * radius * taper;
-      out[i + 1] = (u - 0.5) * 2 * yTop;
-      out[i + 2] = Math.sin(a) * radius * taper;
+      out[i] = Math.cos(a) * r;
+      out[i + 1] = (u - 0.5) * 2 * BRAID.halfHeight;
+      out[i + 2] = Math.sin(a) * r;
     }
   }
 }
 
-// State 3 — Stack. Strands collapse into discrete clusters.
-function clusters(out, strands, len, rand) {
+// State 3 — Stack. Seven small wireframe spheres of latitude rings, on the
+// same centres the old clusters used, each tilted a little differently.
+function wireSpheres(out, strands, len) {
   const K = 7;
-  const centers = [];
+  const centres = [];
   for (let k = 0; k < K; k++) {
-    const u = K === 1 ? 0.5 : k / (K - 1);
-    centers.push([
+    const u = k / (K - 1);
+    centres.push([
       (u - 0.5) * 7.6,
       Math.sin(u * Math.PI * 1.6) * 0.95 - 0.1,
       Math.cos(u * Math.PI * 1.2) * 1.4,
     ]);
   }
 
+  const per = Math.floor(strands / K);
   for (let s = 0; s < strands; s++) {
-    const c = centers[s % K];
-    const spread = 0.42 + rand() * 0.3;
+    const k = Math.min(Math.floor(s / per), K - 1);
+    const first = k * per;
+    const count = k === K - 1 ? strands - first : per;
+    const ring = s - first;
+    const c = centres[k];
+    const r = 0.5 + 0.12 * Math.sin(k * 1.7);
+    const tilt = 0.35 + k * 0.23;
 
-    // Random walk inside the cluster keeps consecutive points close, so the
-    // connecting segments stay short instead of spraying across the cluster.
-    let px = (rand() - 0.5) * spread;
-    let py = (rand() - 0.5) * spread;
-    let pz = (rand() - 0.5) * spread;
-    const step = spread * 0.38;
+    // Latitude rings from pole to pole, each a closed loop.
+    const lat = ((ring + 0.5) / count) * Math.PI;
+    const ringR = Math.sin(lat) * r;
+    const ringY = Math.cos(lat) * r;
 
     for (let l = 0; l < len; l++) {
-      px += (rand() - 0.5) * step;
-      py += (rand() - 0.5) * step;
-      pz += (rand() - 0.5) * step;
-
-      // Keep the walk from drifting out of the cluster.
-      const d = Math.hypot(px, py, pz);
-      if (d > spread) {
-        const k = spread / d;
-        px *= k;
-        py *= k;
-        pz *= k;
-      }
+      const a = (l / (len - 1)) * TAU;
+      const x = Math.cos(a) * ringR;
+      const z = Math.sin(a) * ringR;
+      // Rotate about x by `tilt`.
+      const y2 = ringY * Math.cos(tilt) - z * Math.sin(tilt);
+      const z2 = ringY * Math.sin(tilt) + z * Math.cos(tilt);
 
       const i = (s * len + l) * 3;
-      out[i] = c[0] + px;
-      out[i + 1] = c[1] + py;
-      out[i + 2] = c[2] + pz;
+      out[i] = c[0] + x;
+      out[i + 1] = c[1] + y2;
+      out[i + 2] = c[2] + z2;
     }
   }
 }
@@ -167,19 +184,22 @@ function convergence(out, strands, len, rand) {
   }
 }
 
-const BUILDERS = [torusKnot, recedingPlane, helixColumn, clusters, convergence];
+const BUILDERS = [torusKnot, projectHoops, braidColumn, wireSpheres, convergence];
 
 export const STATE_COUNT = BUILDERS.length;
 
 /**
  * Build one Float32Array of xyz targets per state.
- * Each builder gets its own seeded PRNG so states stay independent and stable.
+ * Each builder gets its own seeded PRNG so states stay independent and stable;
+ * the seed depends only on the state's index, which is why Intro and Contact
+ * are unchanged by edits to the states between them.
+ * `options.projectBands` is the list of data-strand values, in list order.
  */
-export function buildStates(strands, pointsPerStrand) {
+export function buildStates(strands, pointsPerStrand, options = {}) {
   const count = strands * pointsPerStrand;
   return BUILDERS.map((build, index) => {
     const arr = new Float32Array(count * 3);
-    build(arr, strands, pointsPerStrand, mulberry32(0x9e37 + index * 7919));
+    build(arr, strands, pointsPerStrand, mulberry32(0x9e37 + index * 7919), options);
     return arr;
   });
 }
