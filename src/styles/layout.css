@@ -77,6 +77,26 @@
   pointer-events: auto;
 }
 
+/* Content scrolls under the fixed header; fade it out behind the wordmark
+   rather than letting the two sets of type collide. Full-bleed, so it is
+   pinned to the viewport rather than the gutter-inset header box. */
+.chrome::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(clamp(1rem, 2.5vw, 2rem) * 2 + 2.6rem);
+  background: linear-gradient(
+    to bottom,
+    var(--paper) 0%,
+    var(--paper) 55%,
+    rgb(var(--paper-rgb) / 0) 100%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
 .wordmark {
   font-size: var(--size-meta);
   font-weight: 600;
