@@ -82,6 +82,7 @@ precision highp float;
 
 ${posAttributes}
 attribute float aSeed;
+attribute float aHoop;
 
 uniform float uProgress;
 uniform float uTime;
@@ -91,8 +92,7 @@ uniform vec2  uPointer;
 uniform float uPointerStrength;
 uniform float uAspect;
 uniform float uFocus;
-uniform float uFocusBand;
-uniform vec2  uFocusEdge;   // (inner, outer) glow edge in seed space
+uniform float uFocusHoop;   // index of the hovered project's hoop
 uniform float uSettle;      // 0..1: how far the stagger fades out at rest
 uniform float uDepthShift;  // camera pull-back that should not dim the fog
 
@@ -144,9 +144,8 @@ vec4 morphedViewPosition(){
   vFade = 1.0 - smoothstep(4.5, 14.0, depth);
   vFade *= smoothstep(0.0, 1.2, depth); // hide points clipping through camera
 
-  // Circular distance from the highlighted band of strands.
-  float bandDist = abs(fract(aSeed - uFocusBand + 0.5) - 0.5);
-  vGlow = (1.0 - smoothstep(uFocusEdge.x, uFocusEdge.y, bandDist)) * uFocus;
+  // Light exactly the strands of the hovered project's hoop.
+  vGlow = (1.0 - step(0.5, abs(aHoop - uFocusHoop))) * uFocus;
 
   return mv;
 }

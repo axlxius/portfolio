@@ -3,7 +3,7 @@ import './styles/layout.css';
 
 import CornerDots from './scene/CornerDots.js';
 import Scene from './scene/Scene.js';
-import { parseBands } from './scene/bands.js';
+import { parseBands, rowHoopIndices } from './scene/bands.js';
 import { createSectionProgress } from './scroll/progress.js';
 import { createSmoothScroll } from './scroll/smooth.js';
 import { createReveals } from './ui/reveal.js';
@@ -53,12 +53,13 @@ const progress = createSectionProgress(sections);
 const lenis = createSmoothScroll({ reducedMotion });
 
 // Hovering a project lights that project's hoop (and lifts the corner dots).
-strandRows.forEach((el) => {
-  const [band] = parseBands([el.dataset.strand]);
-  if (band === undefined) return;
+const hoopOfRow = rowHoopIndices(strandRows.map((el) => el.dataset.strand));
+strandRows.forEach((el, i) => {
+  const hoop = hoopOfRow[i];
+  if (hoop < 0) return;
   const focus = () => {
-    scene?.setFocus(band);
-    cornerDots?.setFocus(band);
+    scene?.setFocus(hoop);
+    cornerDots?.setFocus(hoop);
   };
   const release = () => {
     scene?.setFocus(null);

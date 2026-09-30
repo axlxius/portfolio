@@ -60,7 +60,10 @@ function torusKnot(out, strands, len, rand) {
 // its seed, so hovering a row lights exactly that hoop.
 export const HOOP = { radius: 1.4, tube: 0.11, gap: 0.64 };
 
-function projectHoops(out, strands, len, _rand, { projectBands = [] } = {}) {
+// Which hoop each strand belongs to, its slot within that hoop, and how many
+// strands each hoop has. Shared by the geometry and the hover index so the two
+// can never disagree.
+function assignHoops(strands, len, projectBands) {
   const bands = projectBands.length ? projectBands : [0.5];
   const seeds = buildSeeds(strands, len);
 
@@ -72,6 +75,24 @@ function projectHoops(out, strands, len, _rand, { projectBands = [] } = {}) {
     hoopOf[s] = k;
     slot[s] = counts[k]++;
   }
+  return { bands, hoopOf, slot, counts };
+}
+
+/**
+ * Per-point hoop index (constant along a strand). Hovering row k lights the
+ * strands tagged k, which is exactly hoop k whatever the values' spacing.
+ */
+export function buildHoopIndex(strands, pointsPerStrand, projectBands = []) {
+  const { hoopOf } = assignHoops(strands, pointsPerStrand, projectBands);
+  const index = new Float32Array(strands * pointsPerStrand);
+  for (let s = 0; s < strands; s++) {
+    index.fill(hoopOf[s], s * pointsPerStrand, (s + 1) * pointsPerStrand);
+  }
+  return index;
+}
+
+function projectHoops(out, strands, len, _rand, { projectBands = [] } = {}) {
+  const { bands, hoopOf, slot, counts } = assignHoops(strands, len, projectBands);
 
   for (let s = 0; s < strands; s++) {
     const k = hoopOf[s];

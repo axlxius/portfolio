@@ -2,9 +2,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   circularDistance,
-  focusEdges,
   nearestBand,
   parseBands,
+  rowHoopIndices,
 } from '../../src/scene/bands.js';
 
 const SIX = [0.05, 0.22, 0.38, 0.55, 0.72, 0.89];
@@ -35,24 +35,8 @@ test('nearestBand picks the circularly nearest, -1 when empty', () => {
   assert.equal(nearestBand(0.5, []), -1);
 });
 
-test('focusEdges: half the smallest gap, inner at 82%', () => {
-  const { inner, outer } = focusEdges(SIX); // smallest gap 0.16 (0.22->0.38, 0.89->0.05)
-  assert.ok(close(outer, 0.08, 1e-9));
-  assert.ok(close(inner, 0.0656, 1e-9));
-});
-
-test('focusEdges follows a seventh project', () => {
-  const seven = Array.from({ length: 7 }, (_, i) => (i + 0.5) / 7);
-  const { outer } = focusEdges(seven);
-  assert.ok(close(outer, 1 / 14, 1e-9));
-});
-
-test('focusEdges never collapses on duplicate or bunched values', () => {
-  assert.equal(focusEdges([0.3, 0.3, 0.6]).outer, 0.02);
-  assert.equal(focusEdges([0.3, 0.301]).outer, 0.02);
-});
-
-test('focusEdges with one or no project lights everything', () => {
-  assert.equal(focusEdges([0.4]).outer, 0.5);
-  assert.equal(focusEdges([]).outer, 0.5);
+test('rowHoopIndices maps each row to its hoop, skipping invalid rows', () => {
+  // Hoop indices count only valid rows, in order, matching parseBands.
+  assert.deepEqual(rowHoopIndices(['0.05', 'abc', '0.22', '', '0.38']), [0, -1, 1, -1, 2]);
+  assert.deepEqual(rowHoopIndices([]), []);
 });

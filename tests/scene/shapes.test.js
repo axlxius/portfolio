@@ -5,6 +5,7 @@ import {
   HOOP,
   STATE_COUNT,
   braidAngle,
+  buildHoopIndex,
   buildSeeds,
   buildStates,
 } from '../../src/scene/shapes.js';
@@ -120,6 +121,42 @@ test('Stack: every point lies on one of seven small spheres', () => {
     const d = Math.min(...centres.map((c) => Math.hypot(spheres[i] - c[0], spheres[i + 1] - c[1], spheres[i + 2] - c[2])));
     assert.ok(d <= 0.63, `point ${i / 3} is ${d} from the nearest centre`);
   }
+});
+
+// Hover lights strands whose hoop index equals the hovered row's. For that to
+// light exactly the row's hoop, every strand's index must be the hoop the Work
+// geometry actually drew it on, for any spacing of values.
+function checkHoopIndex(bands, n, len) {
+  const hoops = buildStates(n, len, { projectBands: bands })[1];
+  const index = buildHoopIndex(n, len, bands);
+  assert.equal(index.length, n * len);
+  const count = bands.length || 1;
+  const perHoop = new Array(count).fill(0);
+  for (let s = 0; s < n; s++) {
+    const k = index[s * len];
+    assert.ok(Number.isInteger(k) && k >= 0 && k < count, `strand ${s} index ${k}`);
+    perHoop[k] += 1;
+    const y0 = ((count - 1) / 2 - k) * HOOP.gap;
+    for (let l = 0; l < len; l++) {
+      assert.equal(index[s * len + l], k, 'index is constant along a strand');
+      const [, y] = pt(hoops, s, l, len);
+      assert.ok(Math.abs(y - y0) <= HOOP.tube + EPS, `strand ${s} drawn off hoop ${k}`);
+    }
+  }
+  return perHoop;
+}
+
+test('hover index: every strand is tagged with the hoop it is drawn on', () => {
+  checkHoopIndex(SIX, 220, 28);
+  checkHoopIndex(SIX, 110, 20);
+});
+
+test('hover index stays exact for uneven, added and removed rows', () => {
+  checkHoopIndex([0.05, 0.22, 0.55, 0.72, 0.89], 220, 28); // a row removed
+  checkHoopIndex([...SIX, 0.95], 220, 28); // a row added, not re-spaced
+  const uneven = checkHoopIndex([0.05, 0.1, 0.5], 220, 28);
+  assert.ok(uneven.every((c) => c > 0), 'every row owns strands');
+  checkHoopIndex([], 220, 28);
 });
 
 test('all states are finite, even with messy bands', () => {

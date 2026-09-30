@@ -35,22 +35,11 @@ export function nearestBand(seed, bands) {
   return best;
 }
 
-// Below this the glow band would be too thin to see.
-const MIN_EDGE = 0.02;
-
 /**
- * Hover glow edges in seed space. `outer` is half the smallest gap between
- * neighbouring bands, so a lit project never bleeds into the next one.
+ * For each row's raw data-strand value, the index of its hoop (its position
+ * among the valid values, as parseBands keeps them), or -1 if it has none.
  */
-export function focusEdges(bands) {
-  if (bands.length < 2) return { inner: 0.41, outer: 0.5 };
-
-  const sorted = [...bands].sort((a, b) => a - b);
-  let gap = 1 - sorted[sorted.length - 1] + sorted[0]; // around the wrap
-  for (let i = 1; i < sorted.length; i++) {
-    gap = Math.min(gap, sorted[i] - sorted[i - 1]);
-  }
-
-  const outer = Math.max(gap / 2, MIN_EDGE);
-  return { inner: outer * 0.82, outer };
+export function rowHoopIndices(values) {
+  let next = 0;
+  return values.map((raw) => (parseBands([raw]).length ? next++ : -1));
 }

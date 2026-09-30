@@ -15,11 +15,11 @@ import {
 
 import {
   STATE_COUNT,
+  buildHoopIndex,
   buildSeeds,
   buildSegmentIndices,
   buildStates,
 } from './shapes.js';
-import { focusEdges } from './bands.js';
 import {
   CAMERA_Y,
   CAMERA_Z,
@@ -87,7 +87,7 @@ export default class Scene {
     this.pointerStrengthTarget = 0;
     this.focus = 0;
     this.focusTarget = 0;
-    this.focusBand = 0;
+    this.focusHoop = 0;
 
     this.elapsed = 0;
     // The caller owns the rAF loop so scroll and rendering are sampled from
@@ -103,7 +103,6 @@ export default class Scene {
     const states = buildStates(strands, pointsPerStrand, {
       projectBands: this.projectBands,
     });
-    const edges = focusEdges(this.projectBands);
     const seeds = buildSeeds(strands, pointsPerStrand);
     const indices = buildSegmentIndices(strands, pointsPerStrand);
 
@@ -112,6 +111,10 @@ export default class Scene {
     // computes the real position from the aPos* targets instead.
     geometry.setAttribute('position', new BufferAttribute(states[0], 3));
     geometry.setAttribute('aSeed', new BufferAttribute(seeds, 1));
+    geometry.setAttribute(
+      'aHoop',
+      new BufferAttribute(buildHoopIndex(strands, pointsPerStrand, this.projectBands), 1)
+    );
     states.forEach((arr, i) => {
       geometry.setAttribute(`aPos${i}`, new BufferAttribute(arr, 3));
     });
@@ -134,8 +137,7 @@ export default class Scene {
       uPointerStrength: { value: 0 },
       uAspect: { value: 1 },
       uFocus: { value: 0 },
-      uFocusBand: { value: 0 },
-      uFocusEdge: { value: new Vector2(edges.inner, edges.outer) },
+      uFocusHoop: { value: 0 },
       uDepthShift: { value: 0 },
       uInk: { value: new Color(0xffffff) },
       uPixelRatio: { value: 1 },
@@ -241,13 +243,13 @@ export default class Scene {
     this.progressTarget = clamp(value, 0, STATE_COUNT - 1);
   }
 
-  /** Highlight a band of strands. Pass null to release. */
-  setFocus(bandOrNull) {
-    if (bandOrNull == null) {
+  /** Light one project's hoop by its index (list order). Pass null to release. */
+  setFocus(hoopOrNull) {
+    if (hoopOrNull == null) {
       this.focusTarget = 0;
       return;
     }
-    this.focusBand = bandOrNull;
+    this.focusHoop = hoopOrNull;
     this.focusTarget = 1;
   }
 
@@ -282,7 +284,7 @@ export default class Scene {
     this.#setUniform('uTime', this.elapsed);
     this.#setUniform('uPointerStrength', this.pointerStrength);
     this.#setUniform('uFocus', this.focus);
-    this.#setUniform('uFocusBand', this.focusBand);
+    this.#setUniform('uFocusHoop', this.focusHoop);
     this.uniforms.uPointer.value.copy(this.pointer);
     this.pointsMaterial.uniforms.uPointer.value.copy(this.pointer);
     this.linesMaterial.uniforms.uPointer.value.copy(this.pointer);
