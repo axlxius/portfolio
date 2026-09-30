@@ -82,9 +82,11 @@ public on deploy. Use an updated copy and decide about the phone number first.
 ### Adding a project
 
 Copy a `.work-item` block and give it a `data-strand` value between `0` and
-`1`. That number picks which band of strands in the 3D scene lights up when
-the row is hovered or focused — space the values out so each project lights a
-visibly different part of the structure.
+`1`. Each row owns one hoop of the Work form, stacked in list order, and
+hovering or focusing the row lights exactly that hoop. The number of hoops
+follows the number of rows automatically. Space the values evenly (for six
+rows: 0.05 / 0.22 / 0.38 / 0.55 / 0.72 / 0.89); the hover edge is derived from
+the smallest gap, so bunched values give thinner hoops.
 
 ## How the 3D works
 
@@ -95,9 +97,9 @@ positions for those same points:
 | Section | Form |
 | --- | --- |
 | Intro | strands woven around a (2,3) torus knot |
-| Work | a mesh plane receding to a horizon |
-| Experience | a twisted helical column |
-| Stack | seven discrete clusters |
+| Work | one hoop per project, stacked in list order |
+| Experience | a braided column: identical helices, alternate strands twisting opposite ways |
+| Stack | seven small wireframe spheres |
 | Contact | convergence onto a single quiet axis |
 
 Every target set is uploaded once as a vertex attribute (`aPos0`–`aPos4`).
@@ -106,6 +108,12 @@ weights, which sum to exactly 1 between any two consecutive states, so the
 morph is a branch-free lerp with no dynamic array indexing. Each strand's
 position on the timeline is nudged by its seed, so the object reforms as a
 flowing wave rather than snapping in lockstep.
+
+That stagger fades out as each section is centred (`uSettle`), so a section at
+rest shows its form fully built. The Intro is the exception: it keeps the full
+stagger, which is what gives the knot its woven look. The Work hoops are laid
+at exactly the angles their strands take in the Experience braid, so that
+transition is a vertical stretch rather than points crossing the shape.
 
 Line segments only ever connect points *within* a strand, so no segment can
 streak across the scene mid-morph however far the endpoints travel.
@@ -121,14 +129,24 @@ exactly when section *N* is centred, regardless of how tall the sections are.
 | Knob | File |
 | --- | --- |
 | Point and strand counts | `DESKTOP` / `MOBILE` in `src/scene/Scene.js` |
-| Camera framing per section | `CAMERA_Z` / `CAMERA_Y` in `src/scene/Scene.js` |
-| Dot size, line opacity | the two `ShaderMaterial` blocks in `src/scene/Scene.js` |
-| Morph spread, drift amount | `uStagger`, `uNoise` in `src/scene/Scene.js` |
+| Dot size, hover dot growth | `DOT_SIZE` / `GLOW_SIZE` in `src/scene/Scene.js` |
+| Line opacity | the lines `ShaderMaterial` in `src/scene/Scene.js` |
+| Camera distance and height per section | `CAMERA_Z` / `CAMERA_Y` in `src/scene/tracks.js` |
+| Morph spread, drift, settling per section | `STAGGER` / `NOISE` / `SETTLE` in `src/scene/tracks.js` |
+| Width kept in frame on narrow screens | `FIT_WIDTH` in `src/scene/tracks.js` |
+| Hoop and braid proportions | `HOOP` / `BRAID` in `src/scene/shapes.js` |
 | The five forms themselves | the builder functions in `src/scene/shapes.js` |
+| Corner dots | `src/scene/CornerDots.js`, placement in `src/styles/layout.css` |
+
+`npm test` runs the Node tests in `tests/`. They check the forms (including
+that the Intro and Contact forms have not changed), the hover band maths and
+the camera fitting.
 
 Adding or removing a builder in `shapes.js` is enough to change the number of
 states — `STATE_COUNT`, the shader attributes and the blend are all generated
-from that array. The section count in `index.html` must match it.
+from that array. The section count in `index.html` must match it, and every
+array in `src/scene/tracks.js` needs one value per state (`npm test` checks
+this).
 
 ## Design notes
 
@@ -146,8 +164,11 @@ to clip at the right viewport edge.
 
 Motion is spent in one place — the scroll morph. Section headings get a single
 clip reveal, once each; body copy and list rows get none. Hovering a project
-row lights its band of strands, which is motion answering an action rather than
-ambient decoration.
+row lights that project's hoop, which is motion answering an action rather than
+ambient decoration. The one ambient exception is a small patch of stationary
+dots in the top-right corner whose brightness breathes outward from the corner;
+it never moves and freezes under reduced motion. Content scrolling under the
+fixed header fades out behind it instead of colliding with the wordmark.
 
 ## Accessibility and fallbacks
 
@@ -161,6 +182,9 @@ ambient decoration.
 - Project rows are anchors and respond to keyboard focus the same way they
   respond to hover.
 - Rendering parks while the tab is hidden; device pixel ratio is capped at 2.
+- The corner dots are a plain 2D canvas: they still show if WebGL fails, are
+  skipped silently if 2D canvas is unavailable, and are static under
+  `prefers-reduced-motion`.
 
 ## Known gaps
 
@@ -168,8 +192,8 @@ ambient decoration.
   links. Add them when a project goes public (Tableau Public for the housing
   study, Streamlit Community Cloud for the dashboard).
 - The write-ups have no screenshots and no measured results yet.
-- The `data-strand` values are set at 0.05 / 0.22 / 0.38 / 0.55 / 0.72 / 0.89
-  for six rows; re-space them if you add or remove a row.
+- Strand count (desktop 220, mobile 110) is chosen at load, so rotating a
+  tablet across 720 px keeps the first count until refresh.
 - No analytics.
 
 ## SEO and link previews

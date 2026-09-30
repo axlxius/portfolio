@@ -11,3 +11,4 @@ dist
 # number that should not end up in a public repo.
 resume/
 .playwright-mcp/
+.playwright-mcp/
