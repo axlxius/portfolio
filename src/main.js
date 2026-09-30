@@ -1,6 +1,7 @@
 import './styles/base.css';
 import './styles/layout.css';
 
+import CornerDots from './scene/CornerDots.js';
 import Scene from './scene/Scene.js';
 import { parseBands } from './scene/bands.js';
 import { createSectionProgress } from './scroll/progress.js';
@@ -29,8 +30,21 @@ try {
   document.documentElement.setAttribute('data-no-webgl', '');
 }
 
+// The corner dots are plain 2D, so they stay even if WebGL failed above.
+const dotsCanvas = document.querySelector('[data-corner-dots]');
+let cornerDots = null;
+try {
+  if (dotsCanvas) cornerDots = new CornerDots(dotsCanvas, { reducedMotion });
+} catch (error) {
+  console.warn('Corner dots unavailable, continuing without them.', error);
+  dotsCanvas?.remove();
+}
+
 createTheme({
-  onChange: (_mode, ink) => scene?.setInk(ink),
+  onChange: (_mode, ink) => {
+    scene?.setInk(ink);
+    cornerDots?.setInk(ink);
+  },
 });
 
 createReveals({ reducedMotion });
@@ -38,12 +52,18 @@ createReveals({ reducedMotion });
 const progress = createSectionProgress(sections);
 const lenis = createSmoothScroll({ reducedMotion });
 
-// Hovering a project lights the band of strands carrying that project's index.
+// Hovering a project lights that project's hoop (and lifts the corner dots).
 strandRows.forEach((el) => {
   const [band] = parseBands([el.dataset.strand]);
   if (band === undefined) return;
-  const focus = () => scene?.setFocus(band);
-  const release = () => scene?.setFocus(null);
+  const focus = () => {
+    scene?.setFocus(band);
+    cornerDots?.setFocus(band);
+  };
+  const release = () => {
+    scene?.setFocus(null);
+    cornerDots?.setFocus(null);
+  };
 
   el.addEventListener('pointerenter', focus);
   el.addEventListener('pointerleave', release);
@@ -86,6 +106,7 @@ function frame(time) {
     scene.setProgress(progress.valueAt(window.scrollY));
     if (dt > 0) scene.update(dt);
   }
+  if (dt > 0) cornerDots?.update(dt);
 }
 
 requestAnimationFrame(frame);
