@@ -92,6 +92,9 @@ uniform float uPointerStrength;
 uniform float uAspect;
 uniform float uFocus;
 uniform float uFocusBand;
+uniform vec2  uFocusEdge;   // (inner, outer) glow edge in seed space
+uniform float uSettle;      // 0..1: how far the stagger fades out at rest
+uniform float uDepthShift;  // camera pull-back that should not dim the fog
 
 varying float vFade;
 varying float vGlow;
@@ -103,8 +106,11 @@ float tent(float i, float p){ return max(0.0, 1.0 - abs(p - i)); }
 vec4 morphedViewPosition(){
   // Stagger each strand slightly so the morph flows across the object
   // instead of every point arriving in lockstep.
+  // The stagger fades out as progress lands on a whole state, so a centred
+  // section shows its form fully built rather than half-morphed.
+  float settle = mix(1.0, sin(3.14159265 * fract(uProgress)), uSettle);
   float p = clamp(
-    uProgress + (aSeed - 0.5) * uStagger,
+    uProgress + (aSeed - 0.5) * uStagger * settle,
     0.0,
     ${(STATE_COUNT - 1).toFixed(1)}
   );
@@ -134,13 +140,13 @@ vec4 morphedViewPosition(){
     mv.z  += influence * 0.3;
   }
 
-  float depth = -mv.z;
+  float depth = -mv.z - uDepthShift;
   vFade = 1.0 - smoothstep(4.5, 14.0, depth);
   vFade *= smoothstep(0.0, 1.2, depth); // hide points clipping through camera
 
   // Circular distance from the highlighted band of strands.
   float bandDist = abs(fract(aSeed - uFocusBand + 0.5) - 0.5);
-  vGlow = (1.0 - smoothstep(0.0, 0.13, bandDist)) * uFocus;
+  vGlow = (1.0 - smoothstep(uFocusEdge.x, uFocusEdge.y, bandDist)) * uFocus;
 
   return mv;
 }
@@ -151,11 +157,12 @@ ${VERTEX_COMMON}
 
 uniform float uSize;
 uniform float uPixelRatio;
+uniform float uGlowSize;
 
 void main(){
   vec4 mv = morphedViewPosition();
   gl_Position = projectionMatrix * mv;
-  gl_PointSize = uSize * uPixelRatio * (1.0 + vGlow * 1.6)
+  gl_PointSize = uSize * uPixelRatio * (1.0 + vGlow * uGlowSize)
                * (4.0 / max(-mv.z, 0.001));
 }
 `;

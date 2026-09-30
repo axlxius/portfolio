@@ -19,6 +19,17 @@ import {
   buildSegmentIndices,
   buildStates,
 } from './shapes.js';
+import { focusEdges } from './bands.js';
+import {
+  CAMERA_Y,
+  CAMERA_Z,
+  FIT_WIDTH,
+  NOISE,
+  SETTLE,
+  STAGGER,
+  fitCameraZ,
+  sampleTrack,
+} from './tracks.js';
 
 import {
   linesFragment,
@@ -30,26 +41,20 @@ import {
 const DESKTOP = { strands: 220, pointsPerStrand: 28 };
 const MOBILE = { strands: 110, pointsPerStrand: 20 };
 
-// Camera distance per state. The camera eases with the morph so each
-// configuration is framed deliberately rather than all at one focal length.
-const CAMERA_Z = [6.4, 5.2, 7.2, 8.4, 7.6];
-const CAMERA_Y = [0.0, 1.05, 0.0, 0.1, 0.0];
+// Dots are sized in pixels but the object scales with viewport height.
+const DOT_SIZE = 3.2;
+// How much a lit strand's dots grow. A lift in brightness with a small size
+// change reads as "this project" without the hoop turning heavy.
+const GLOW_SIZE = 0.45;
 
 const lerp = (a, b, t) => a + (b - a) * t;
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
-// Sample a per-state track at a fractional progress value.
-function sampleTrack(track, progress) {
-  const p = clamp(progress, 0, track.length - 1);
-  const i = Math.floor(p);
-  const j = Math.min(i + 1, track.length - 1);
-  return lerp(track[i], track[j], p - i);
-}
-
 export default class Scene {
-  constructor(canvas, { reducedMotion = false } = {}) {
+  constructor(canvas, { reducedMotion = false, projectBands = [] } = {}) {
     this.canvas = canvas;
     this.reducedMotion = reducedMotion;
+    this.projectBands = projectBands;
 
     this.renderer = new WebGLRenderer({
       canvas,
@@ -95,7 +100,10 @@ export default class Scene {
 
   #buildGeometry(strands, pointsPerStrand) {
     const count = strands * pointsPerStrand;
-    const states = buildStates(strands, pointsPerStrand);
+    const states = buildStates(strands, pointsPerStrand, {
+      projectBands: this.projectBands,
+    });
+    const edges = focusEdges(this.projectBands);
     const seeds = buildSeeds(strands, pointsPerStrand);
     const indices = buildSegmentIndices(strands, pointsPerStrand);
 
@@ -119,13 +127,16 @@ export default class Scene {
     this.uniforms = {
       uProgress: { value: 0 },
       uTime: { value: 0 },
-      uStagger: { value: 0.55 },
-      uNoise: { value: 0.12 },
+      uStagger: { value: STAGGER[0] },
+      uNoise: { value: NOISE[0] },
+      uSettle: { value: SETTLE[0] },
       uPointer: { value: new Vector2(0, 0) },
       uPointerStrength: { value: 0 },
       uAspect: { value: 1 },
       uFocus: { value: 0 },
       uFocusBand: { value: 0 },
+      uFocusEdge: { value: new Vector2(edges.inner, edges.outer) },
+      uDepthShift: { value: 0 },
       uInk: { value: new Color(0xffffff) },
       uPixelRatio: { value: 1 },
     };
@@ -140,7 +151,8 @@ export default class Scene {
       blending: NormalBlending,
       uniforms: {
         ...shared,
-        uSize: { value: 3.2 },
+        uSize: { value: DOT_SIZE },
+        uGlowSize: { value: GLOW_SIZE },
         uOpacity: { value: 0.55 },
       },
     });
@@ -218,6 +230,10 @@ export default class Scene {
 
     // Narrow viewports need the object pulled back to stay inside the frame.
     this.frameScale = clamp(1.35 - this.camera.aspect * 0.28, 1, 1.5);
+
+    // Keep the dot-to-shape ratio roughly constant, so landscape phones don't
+    // get chunky dots.
+    this.pointsMaterial.uniforms.uSize.value = DOT_SIZE * clamp(height / 900, 0.6, 1.1);
   }
 
   /** Scroll-driven morph position, in units of state index. */
@@ -260,6 +276,9 @@ export default class Scene {
     if (!this.reducedMotion) this.elapsed += dt;
 
     this.#setUniform('uProgress', this.progress);
+    this.#setUniform('uStagger', sampleTrack(STAGGER, this.progress));
+    this.#setUniform('uNoise', sampleTrack(NOISE, this.progress));
+    this.#setUniform('uSettle', sampleTrack(SETTLE, this.progress));
     this.#setUniform('uTime', this.elapsed);
     this.#setUniform('uPointerStrength', this.pointerStrength);
     this.#setUniform('uFocus', this.focus);
@@ -272,9 +291,17 @@ export default class Scene {
     this.group.rotation.y = this.elapsed * 0.045 + this.progress * 0.52;
     this.group.rotation.x = Math.sin(this.progress * 0.8) * 0.16;
 
-    this.camera.position.z =
-      sampleTrack(CAMERA_Z, this.progress) * this.frameScale;
+    const baseZ = sampleTrack(CAMERA_Z, this.progress) * this.frameScale;
+    const z = fitCameraZ(
+      baseZ,
+      sampleTrack(FIT_WIDTH, this.progress),
+      this.camera.fov,
+      this.camera.aspect
+    );
+    this.camera.position.z = z;
     this.camera.position.y = sampleTrack(CAMERA_Y, this.progress);
+    // The extra distance is only for framing: keep depth fog from dimming it.
+    this.#setUniform('uDepthShift', z - baseZ);
     this.camera.lookAt(0, this.camera.position.y * 0.35, 0);
 
     this.renderer.render(this.scene, this.camera);
