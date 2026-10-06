@@ -158,12 +158,12 @@ const manifest = { fps: FPS, qa: QA_ONLY, main: {}, case: {}, cursor: {} };
       const name = row.querySelector('.work-name').getBoundingClientRect();
       const r = row.getBoundingClientRect();
       return {
-        x: name.left + Math.min(name.width / 2, 120),
+        x: name.right + 28, // just past the name, so the ring never covers it
         y: r.top + window.scrollY - workY + r.height / 2,
       };
     });
     const b = document.querySelector('[data-theme-toggle]').getBoundingClientRect();
-    return { rows, toggle: { x: b.left + b.width / 2, y: b.top + b.height / 2 } };
+    return { rows, toggle: { x: b.right - 10, y: b.top + b.height / 2 + 6 } };
   }, measured.work);
 
   manifest.stops = measured;
