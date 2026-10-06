@@ -12,3 +12,7 @@ dist
 resume/
 .playwright-mcp/
 .playwright-mcp/
+
+# Showcase video frames and renders.
+video/out/
+video/node_modules/

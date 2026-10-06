@@ -1,0 +1,15 @@
+{
+  "name": "portfolio-showcase-video",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic capture and render of the portfolio showcase film. See README.md.",
+  "scripts": {
+    "capture": "node capture.mjs",
+    "capture:qa": "node capture.mjs --qa",
+    "render": "node render.mjs",
+    "render:qa": "node render.mjs --qa"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}
