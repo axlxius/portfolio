@@ -71,8 +71,10 @@ export const INTRO = {
   name: 'Alexius Lee',
   lead:
     'Business and financial technology student at Nanyang Polytechnic, currently interning at GovTech. I build data dashboards and full-stack tools, and I enjoy tinkering with new ways to solve old problems.',
+  /** The one line that survives on the title card. */
+  short: 'I build data dashboards and full-stack tools, and I enjoy tinkering with new ways to solve old problems.',
   tags: ['Business and financial technology', 'Based in Singapore', 'Open to work'],
-  cue: 'Scroll to read on.',
+  cue: 'Scroll to play',
 } as const;
 
 // --- Selected work -----------------------------------------------------------
@@ -243,6 +245,15 @@ export const CONTACT = {
 
 export const MARQUEE = ['Business', 'Technology', 'Finance', 'Data'] as const;
 
+// --- Scene labels ----------------------------------------------------------------
+
+/** Small headings for the scenes that have no display title of their own. */
+export const LABELS = {
+  experience: 'Experience',
+  stack: 'Toolkit',
+  credits: 'Credits',
+} as const;
+
 // --- Sections ------------------------------------------------------------------
 
 /** Section ids and header labels, in page order. One morph state each. */
@@ -250,6 +261,6 @@ export const SECTIONS = [
   { id: 'intro', label: 'Intro' },
   { id: 'work', label: 'Work' },
   { id: 'experience', label: 'Experience' },
-  { id: 'stack', label: 'Stack' },
+  { id: 'stack', label: 'Toolkit' },
   { id: 'contact', label: 'Contact' },
 ] as const;

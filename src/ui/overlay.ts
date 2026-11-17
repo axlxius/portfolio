@@ -50,7 +50,7 @@ export function createOverlay(scroll: SmoothScroll) {
   const part = (name: string) => qs(`[data-o-${name}]`, root)!;
   const titleEl = part('title');
   const runner = createVisualRunner(qs<HTMLCanvasElement>('canvas', root)!);
-  const page = [qs('.page'), qs('.chrome')];
+  const page = [qs('.page'), qs('.hud'), qs('.scrubber')];
 
   let index = -1;
   let opener: HTMLElement | null = null;
@@ -138,7 +138,7 @@ export function createOverlay(scroll: SmoothScroll) {
       page.forEach((node) => node?.setAttribute('inert', ''));
       // Focus moves in only once the dialog is actually on screen.
       titleEl.focus({ preventScroll: true });
-    }, from?.querySelector<HTMLElement>('.work-name') ?? null);
+    }, from?.querySelector<HTMLElement>('[data-title]') ?? null);
 
     scroll.lock(true);
     runner.start();
@@ -149,7 +149,7 @@ export function createOverlay(scroll: SmoothScroll) {
     if (index < 0) return;
     index = -1;
     const from = opener;
-    const rowTitle = from?.querySelector<HTMLElement>('.work-name') ?? null;
+    const rowTitle = from?.querySelector<HTMLElement>('[data-title]') ?? null;
     opener = null;
 
     transition(() => {

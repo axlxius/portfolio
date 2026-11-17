@@ -16,7 +16,8 @@
   will-change: transform;
 }
 
-:root[data-theme='dark'] .grain {
+:root[data-theme='dark']:not([data-invert]) .grain,
+:root[data-theme='light'][data-invert] .grain {
   opacity: 0.04;
 }
 
@@ -204,59 +205,17 @@ html.has-cursor * {
   transform-origin: left center;
 }
 
-/* While the intro plays, the header waits. */
-html.is-loading .chrome,
-html.is-loading .progress {
+/* While the intro plays, the HUD waits. */
+html.is-loading .hud,
+html.is-loading .scrubber,
+html.is-loading .playhead {
   opacity: 0;
 }
 
-.chrome,
-.progress {
+.hud,
+.scrubber,
+.playhead {
   transition: opacity 0.9s var(--ease);
-}
-
-/* --- Preview card ---------------------------------------------------------
-   Follows the pointer over the work list. An inverted tile, so it reads as a
-   cut-out of the opposite theme. */
-
-.preview {
-  position: fixed;
-  z-index: 80;
-  top: 0;
-  left: 0;
-  width: clamp(15rem, 22vw, 21rem);
-  pointer-events: none;
-  will-change: transform;
-}
-
-.preview-card {
-  background: var(--accent-invert);
-  color: var(--on-invert);
-  clip-path: inset(50% 0 50% 0);
-  transform: scale(0.94);
-  transition: clip-path 0.5s var(--ease), transform 0.5s var(--ease);
-}
-
-.preview.is-open .preview-card {
-  clip-path: inset(0);
-  transform: none;
-}
-
-.preview-canvas {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-}
-
-.preview-caption {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.6rem 0.8rem 0.7rem;
-  border-top: 1px solid rgb(var(--bg-rgb) / 0.2);
-}
-
-.preview-caption .mono {
-  color: rgb(var(--bg-rgb) / 0.7);
 }
 
 /* --- Project overlay -------------------------------------------------------- */

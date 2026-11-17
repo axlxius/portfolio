@@ -3,23 +3,24 @@
  *
  * These are plain string templates with no DOM access, because they run inside
  * the Vite config at build time. The result is injected into index.html, so the
- * shipped page has all of its text before any script runs. Behaviour is added
- * afterwards by the modules in src/sections/ and src/ui/.
+ * shipped page has all of its text before any script runs.
+ *
+ * The page is written as five scenes. Without JavaScript, or with reduced
+ * motion, they are ordinary stacked sections that read top to bottom. With
+ * motion, src/scenes/ pins them and scrubs their choreography with the scroll.
  */
 import {
   CERTIFICATIONS,
   CONTACT,
   EDUCATION,
-  EXPERIENCE_TITLE,
   INTRO,
+  LABELS,
   LINKS,
-  MARQUEE,
   META,
   PROJECTS,
   ROLES,
   SECTIONS,
   SKILLS,
-  STACK_TITLE,
   WORK_TITLE,
 } from '../data/content.ts';
 import type { Project } from '../data/content.ts';
@@ -31,186 +32,164 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
 
 const ARROW = `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true"><path d="M5 19 19 5M8 5h11v11"/></svg>`;
 
-// A check inside a ring. Drawn on hover via stroke-dashoffset (see layout.css).
-const SEAL = `<svg class="seal" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true"><circle class="seal-ring" cx="16" cy="16" r="13" pathLength="1"/><circle class="seal-dash" cx="16" cy="16" r="10" stroke-dasharray="1.2 3.2"/><path class="seal-check" d="m11 16.5 3.4 3.4L21.5 12.5" pathLength="1"/></svg>`;
-
-const STAR = `<svg class="star" viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M8 0c.5 4.6 3.4 7.5 8 8-4.6.5-7.5 3.4-8 8-.5-4.6-3.4-7.5-8-8 4.6-.5 7.5-3.4 8-8Z"/></svg>`;
-
-const title = (text: string, attrs = '') =>
-  `<div class="bleed"><h2 class="title" data-reveal${attrs}><span class="title-inner">${esc(text)}</span></h2></div>`;
-
 const rule = `<span class="rule" aria-hidden="true"></span>`;
 
-function chrome(): string {
-  const links = SECTIONS.map(
-    (s, i) => `<li><a href="#${s.id}" data-nav="${s.id}" data-count="${pad2(i + 1)}">${esc(s.label)}</a></li>`
+/** The first four-digit year in a date range, for the timeline keyframes. */
+const yearOf = (dates: string) => dates.match(/\d{4}/)?.[0] ?? dates;
+
+/**
+ * The fixed layer: a heads-up display like an editing timeline. Wordmark and
+ * controls on top, a scene label and running timecode, and a scrubber along
+ * the bottom whose marks are the section links.
+ */
+function hud(): string {
+  const marks = SECTIONS.map(
+    (s, i) =>
+      `<li><a class="mark" href="#${s.id}" data-mark="${s.id}"><span class="mark-tick" aria-hidden="true"></span><span class="mark-label">${pad2(i + 1)}<span class="mark-name"> ${esc(s.label)}</span></span></a></li>`
   ).join('');
+
   return `
-    <header class="chrome">
+    <header class="hud">
       <a class="wordmark" href="#intro" data-magnetic>${esc(META.name)}</a>
-      <div class="chrome-right">
-        <nav class="nav" aria-label="Sections" data-nav-root>
-          <button class="nav-current" type="button" aria-expanded="false" aria-controls="nav-list" data-nav-current>
-            <span class="visually-hidden">Sections. Current: </span>
-            <span class="nav-roll" data-nav-roll><span>${esc(SECTIONS[0].label)}</span></span>
-          </button>
-          <ul class="nav-list" id="nav-list">${links}</ul>
-        </nav>
+      <p class="hud-scene mono" aria-hidden="true"><span class="hud-dot"></span><span class="hud-roll" data-hud-roll><span>01 ${esc(SECTIONS[0].label)}</span></span></p>
+      <div class="hud-right">
+        <span class="hud-tc mono" data-timecode aria-hidden="true">00:00:00:00</span>
         <button class="pref mono" type="button" data-motion-toggle aria-pressed="false" aria-label="Reduce motion">Motion</button>
         <button class="pref mono" type="button" data-sound-toggle aria-pressed="false" aria-label="Sound" data-off>Sound</button>
         <button class="toggle" type="button" data-theme-toggle data-magnetic aria-pressed="false">
           <span data-theme-label>Dark</span>
         </button>
       </div>
-    </header>`;
+    </header>
+    <nav class="scrubber" aria-label="Scenes">
+      <div class="scrubber-track" aria-hidden="true"><span class="scrubber-fill" data-scrub-fill></span></div>
+      <ol class="scrubber-marks">${marks}</ol>
+    </nav>
+    <span class="playhead" data-playhead aria-hidden="true"></span>`;
 }
 
+// --- Scene 1: title card --------------------------------------------------------
+
 function intro(): string {
-  const tags = INTRO.tags.map((t) => `<li class="chip" data-fade>${esc(t)}</li>`).join('');
   return `
-      <section class="section section--intro" id="intro" data-section="Intro" aria-labelledby="intro-title">
-        <div class="bleed bleed--hero">
+      <section class="scene scene--title" id="intro" data-section="Intro" aria-labelledby="intro-title">
+        <div class="title-stage">
+          <div class="title-top" data-title-fade>
+            <p class="title-meta mono" data-fade>${INTRO.tags.map(esc).join('<span aria-hidden="true"> / </span><span class="visually-hidden">, </span>')}</p>
+          </div>
           <h1 class="display" id="intro-title" data-hero-name>${esc(INTRO.name)}</h1>
-        </div>
-        <div class="intro-body">
-          <p class="lead" data-hero-lead>${esc(INTRO.lead)}</p>
-          <ul class="chips" aria-label="At a glance" data-hero-tags>${tags}</ul>
-          <p class="intro-scroll mono" data-hero-cue data-fade>
-            <span>${esc(INTRO.cue)}</span>
-            <span class="intro-scroll-line" aria-hidden="true"></span>
-          </p>
+          <div class="title-foot" data-title-fade>
+            <p class="lead title-line" data-hero-lead>${esc(INTRO.short)}</p>
+            <p class="title-cue mono" data-hero-cue data-fade><span>${esc(INTRO.cue)}</span><span class="title-cue-line" aria-hidden="true"></span></p>
+          </div>
         </div>
       </section>`;
 }
 
-/** Without JavaScript a row goes to the best page that exists for it. */
+// --- Scene 2: the work reel --------------------------------------------------------
+
+/** Without JavaScript a title goes to the best page that exists for it. */
 function projectHref(p: Project): string | null {
   return p.writeUp ?? p.repo ?? p.live;
 }
 
 function work(): string {
-  const rows = PROJECTS.map((p, i) => {
+  const items = PROJECTS.map((p, i) => {
     const href = projectHref(p);
     const external = href !== null && /^https?:/.test(href);
     const open = href
-      ? `<a class="work-link" href="${esc(href)}"${external ? ' rel="noreferrer"' : ''}`
-      : `<button class="work-link" type="button"`;
+      ? `<a class="reel-link" href="${esc(href)}"${external ? ' rel="noreferrer"' : ''}`
+      : `<button class="reel-link" type="button"`;
     const close = href ? '</a>' : '</button>';
     return `
-          <li class="work-item" data-fade>
+          <li class="reel-item" data-reel="${i}">
             ${open} data-project="${p.slug}" data-cursor="view">
-              <span class="work-index mono" aria-hidden="true">${pad2(i + 1)}</span>
-              <span class="work-name">${esc(p.title)}</span>
-              <span class="work-note">${esc(p.note)}</span>
-              <span class="work-year mono">${esc(p.year)}</span>
-              <span class="work-arrow">${ARROW}</span>
+              <span class="reel-index mono">${pad2(i + 1)} / ${pad2(PROJECTS.length)}</span>
+              <span class="reel-title" data-title>${esc(p.title)}</span>
+              <span class="reel-note">${esc(p.note)}</span>
+              <span class="reel-meta mono"><span>${esc(p.year)}</span><span class="reel-open">Open ${ARROW}</span></span>
             ${close}
-            ${rule}
           </li>`;
   }).join('');
 
   return `
-      <section class="section" id="work" data-section="Work" aria-labelledby="work-title">
-        ${title(WORK_TITLE, ' id="work-title"')}
-        <ol class="work-list" data-work-list>
-          <li class="work-head" aria-hidden="true">${rule}</li>${rows}
-        </ol>
+      <section class="scene scene--work" id="work" data-section="Work" aria-labelledby="work-title">
+        <div class="reel-stage">
+          <div class="reel-head">
+            <h2 class="scene-label mono" id="work-title">${esc(WORK_TITLE)}</h2>
+            <p class="reel-count mono" aria-hidden="true"><span class="reel-count-roll" data-reel-count><span>00</span></span> / ${pad2(PROJECTS.length)}</p>
+          </div>
+          <ol class="reel">${items}
+          </ol>
+        </div>
       </section>`;
 }
 
-function marquee(): string {
-  const run = MARQUEE.map((w) => `<span class="marquee-word">${esc(w)}</span><span class="marquee-x">×</span>`).join('');
-  // Two identical runs so the track can loop without a visible seam.
-  return `
-      <div class="marquee" data-marquee aria-hidden="true">
-        <div class="marquee-track" data-marquee-track>
-          <div class="marquee-run">${run}</div>
-          <div class="marquee-run">${run}</div>
-        </div>
-      </div>`;
-}
+// --- Scene 3: the timeline ------------------------------------------------------------
 
 function experience(): string {
-  const roles = ROLES.map((r, i) => {
-    const skills = r.skills.length
-      ? `<p class="role-skills mono"><span class="visually-hidden">Skills used: </span>${r.skills
-          .map(esc)
-          .join('<span aria-hidden="true"> / </span><span class="visually-hidden">, </span>')}</p>`
-      : '';
-    return `
-          <li class="role" data-role="${i}"${r.skills.length ? ' tabindex="0"' : ''}>
-            ${rule}
-            <p class="role-date mono" data-role-date data-fade>${esc(r.dates)}</p>
-            <div class="role-main">
-              <h3 class="role-title" data-lines>${esc(r.title)}</h3>
-              <p class="role-body" data-lines>${esc(r.body)}</p>
-              ${skills}
-            </div>
-          </li>`;
-  }).join('');
+  // Oldest on the left, as on any timeline.
+  const roles = [...ROLES].reverse();
+  const keys = roles
+    .map(
+      (r, i) =>
+        `<li class="tl-key" data-key="${i}"><span class="tl-diamond" aria-hidden="true"></span><span class="tl-year">${esc(yearOf(r.dates))}</span></li>`
+    )
+    .join('');
+  const cards = roles
+    .map(
+      (r, i) => `
+          <li class="tl-role" data-role="${i}">
+            <p class="tl-dates mono">${esc(r.dates)}</p>
+            <h3 class="tl-title" data-title>${esc(r.title)}</h3>
+          </li>`
+    )
+    .join('');
 
   return `
-      <section class="section" id="experience" data-section="Experience" aria-labelledby="experience-title">
-        ${title(EXPERIENCE_TITLE, ' id="experience-title"')}
-        <ol class="roles">${roles}
-        </ol>
+      <section class="scene scene--timeline" id="experience" data-section="Experience" aria-labelledby="experience-title">
+        <div class="tl-stage">
+          <h2 class="scene-label mono" id="experience-title">${esc(LABELS.experience)}</h2>
+          <div class="tl-rail" aria-hidden="true">
+            <span class="tl-line" data-tl-line></span>
+            <span class="tl-playhead" data-tl-playhead></span>
+          </div>
+          <ol class="tl-keys" aria-hidden="true">${keys}</ol>
+          <ol class="tl-roles">${cards}
+          </ol>
+        </div>
       </section>`;
 }
+
+// --- Scene 4: the toolkit -------------------------------------------------------------
 
 function stack(): string {
-  const groups = SKILLS.map((g, gi) => {
-    const items = g.items
-      .map((item) => `<li class="pill" data-pill data-cursor="drag"><span>${esc(item)}</span></li>`)
-      .join('');
-    return `
-            <div class="group" data-group="${gi}" data-fade>
-              <h3 class="group-name" id="group-${gi}">
-                <button type="button" data-group-toggle aria-pressed="false">${esc(g.name)}</button>
-              </h3>
-              ${rule}
-              <ul class="group-list" aria-labelledby="group-${gi}">${items}</ul>
-            </div>`;
-  }).join('');
-
-  const education = EDUCATION.map(
-    (e) =>
-      `<li>${esc(e.text)}${
-        e.honour ? `<span class="honour">${STAR}<span>${esc(e.honour)}</span></span>` : ''
-      }</li>`
-  ).join('');
-
-  const certs = CERTIFICATIONS.map(
-    (c) =>
-      `<li class="cert">${SEAL}<span class="cert-name">${esc(c.name)}</span><span class="cert-issuer mono">${esc(c.issuer)}</span></li>`
+  const rows = SKILLS.map(
+    (g, gi) => `
+          <div class="kit-row" data-kit-row="${gi}">
+            <h3 class="kit-group mono">${esc(g.name)}</h3>
+            <ul class="kit-words">${g.items.map((item) => `<li class="kit-word">${esc(item)}</li>`).join('')}</ul>
+          </div>`
   ).join('');
 
   return `
-      <section class="section" id="stack" data-section="Stack" aria-labelledby="stack-title">
-        ${title(STACK_TITLE, ' id="stack-title"')}
-        <div class="field" data-field>
-          <div class="field-bar" data-fade>
-            <p class="field-hint mono" data-field-hint hidden>Drag a word. It finds its way back.</p>
-            <button class="field-toggle mono" type="button" data-field-toggle aria-pressed="false" hidden>Scatter</button>
-          </div>
-          <div class="groups">${groups}
-          </div>
-        </div>
-        <div class="credentials">
-          <div class="credential" data-fade>
-            <h3 class="group-name">Education</h3>
-            ${rule}
-            <ul class="cred-list">${education}</ul>
-          </div>
-          <div class="credential" data-fade>
-            <h3 class="group-name">Certifications</h3>
-            ${rule}
-            <ul class="cred-list cred-list--certs">${certs}</ul>
-          </div>
+      <section class="scene scene--kit" id="stack" data-section="Toolkit" aria-labelledby="stack-title">
+        <h2 class="scene-label mono" id="stack-title">${esc(LABELS.stack)}</h2>
+        <div class="kit" data-skew>${rows}
         </div>
       </section>`;
 }
 
+// --- Scene 5: credits and contact -----------------------------------------------------
+
 function contact(): string {
+  const education = EDUCATION.map(
+    (e) => `<dd>${esc(e.text)}${e.honour ? `<span class="credit-note">${esc(e.honour)}</span>` : ''}</dd>`
+  ).join('');
+  const certs = CERTIFICATIONS.map(
+    (c) => `<dd>${esc(c.name)}<span class="credit-note">${esc(c.issuer)}</span></dd>`
+  ).join('');
+
   const links = CONTACT.links
     .map((l) => {
       const external = l.kind === 'external' ? ' rel="noreferrer"' : '';
@@ -219,11 +198,21 @@ function contact(): string {
     .join('');
 
   return `
-      <section class="section section--contact" id="contact" data-section="Contact" aria-labelledby="contact-title">
-        ${title(CONTACT.title, ' id="contact-title" data-scramble')}
-        <div class="contact-body">
-          <p class="body" data-lines>${esc(CONTACT.body)}</p>
-          <ul class="contact-links">${links}</ul>
+      <section class="scene scene--end" id="contact" data-section="Contact" aria-labelledby="contact-title">
+        <div class="credits">
+          <h2 class="scene-label mono" data-fade>${esc(LABELS.credits)}</h2>
+          <dl class="credit-list">
+            <div class="credit" data-fade><dt class="mono">Education</dt>${education}</div>
+            <div class="credit" data-fade><dt class="mono">Certifications</dt>${certs}</div>
+            <div class="credit" data-fade><dt class="mono">Built with</dt><dd>Three.js, GSAP, Lenis and Vite</dd></div>
+          </dl>
+        </div>
+        <div class="contact">
+          <div class="bleed"><h2 class="title" id="contact-title" data-reveal data-scramble><span class="title-inner">${esc(CONTACT.title)}</span></h2></div>
+          <div class="contact-body">
+            <p class="body" data-lines>${esc(CONTACT.body)}</p>
+            <ul class="contact-links">${links}</ul>
+          </div>
         </div>
         <footer class="colophon">
           ${rule}
@@ -238,11 +227,10 @@ function contact(): string {
 export function renderBody(): string {
   return `
     <a class="skip" href="#main">Skip to content</a>
-    <canvas class="scene" data-scene aria-hidden="true"></canvas>
-    <canvas class="dotgrid" data-dotgrid aria-hidden="true"></canvas>
+    <canvas class="scene-canvas" data-scene aria-hidden="true"></canvas>
     <div class="shade" aria-hidden="true"></div>
-    ${chrome()}
-    <main class="page" id="main">${intro()}${work()}${experience()}${marquee()}${stack()}${contact()}
+    ${hud()}
+    <main class="page" id="main">${intro()}${work()}${experience()}${stack()}${contact()}
     </main>`;
 }
 

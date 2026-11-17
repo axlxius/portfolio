@@ -56,7 +56,10 @@ export function createSmoothScroll() {
     const target = document.querySelector<HTMLElement>(id);
     if (!target) return;
     event.preventDefault();
-    scrollTo(target);
+    // A pinned scene sits at the far end of its spacer once played through;
+    // its start is the top of the spacer.
+    const spacer = target.parentElement?.classList.contains('pin-spacer') ? target.parentElement : null;
+    scrollTo((spacer ?? target).getBoundingClientRect().top + window.scrollY);
     // Keep keyboard focus moving with the jump.
     target.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });
