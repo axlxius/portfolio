@@ -11,6 +11,10 @@ export const CAMERA_Y = [0.0, 0.25, 0.0, 0.0, 0.0, 0.0];
 // is right, positive y is up. Reading sections push it into the open right
 // third so type and particles do not fight. Fades to centre on narrow screens.
 export const OFFSET_X = [0.25, 0.31, 0.3, 0.04, 0.24, 0.24];
+// The same, for narrow (portrait) screens, where there is no open third: the
+// reading sections park the object against the right edge, half out of frame,
+// so it runs down the margin instead of through the copy.
+export const OFFSET_X_NARROW = [0, 0.3, 0.38, 0, 0.36, 0.44];
 export const OFFSET_Y = [0.13, 0.0, 0.0, -0.06, 0.0, 0.0];
 
 // Per-point morph offset: how far the wave of re-forming spreads.

@@ -182,6 +182,7 @@ precision highp float;
 uniform vec3  uInk;
 uniform float uOpacity;
 uniform float uAdditive;
+uniform float uGlowGain;
 
 varying float vAlpha;
 varying float vGlow;
@@ -189,7 +190,7 @@ varying float vCoc;
 
 void main(){
   float d = length(gl_PointCoord - 0.5);
-  float alpha = smoothstep(0.5, 0.1, d) * vAlpha * (uOpacity + vGlow * 0.55);
+  float alpha = smoothstep(0.5, 0.1, d) * vAlpha * (uOpacity + vGlow * 0.55 * uGlowGain);
   alpha = min(alpha, 1.0);
   if (alpha < 0.003) discard;
   gl_FragColor = vec4(uInk * alpha, alpha * (1.0 - uAdditive));
@@ -210,13 +211,14 @@ precision highp float;
 uniform vec3  uInk;
 uniform float uLineOpacity;
 uniform float uAdditive;
+uniform float uGlowGain;
 
 varying float vAlpha;
 varying float vGlow;
 varying float vCoc;
 
 void main(){
-  float alpha = min(vAlpha * (uLineOpacity + vGlow * 0.22), 1.0);
+  float alpha = min(vAlpha * (uLineOpacity + vGlow * 0.22 * uGlowGain), 1.0);
   if (alpha < 0.003) discard;
   gl_FragColor = vec4(uInk * alpha, alpha * (1.0 - uAdditive));
 }

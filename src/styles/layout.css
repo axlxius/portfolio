@@ -45,6 +45,14 @@
   );
 }
 
+/* On narrow screens there is no open third for the object to sit in, so it
+   runs behind the copy. A flat wash keeps the text in front of it. */
+@media (max-width: 760px) {
+  .shade {
+    background: rgb(var(--bg-rgb) / 0.5);
+  }
+}
+
 :root[data-no-webgl] .shade,
 :root[data-no-webgl] .scene {
   display: none;

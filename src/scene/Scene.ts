@@ -27,6 +27,7 @@ import {
   FIT_WIDTH,
   NOISE,
   OFFSET_X,
+  OFFSET_X_NARROW,
   OFFSET_Y,
   SPIN,
   STAGGER,
@@ -210,6 +211,7 @@ export default class Scene {
       uSize: { value: tier.size },
       uOpacity: { value: tier.opacity },
       uLineOpacity: { value: tier.line },
+      uGlowGain: { value: 1 },
     };
 
     const common = {
@@ -446,9 +448,11 @@ export default class Scene {
     // On narrow screens the object sits behind the copy, so it is held back
     // everywhere except the hero.
     const narrow = 1 - clamp((this.camera.aspect - 0.85) / 0.55, 0, 1);
-    const behindCopy = lerp(1, 0.5, narrow * clamp(this.progress * 2, 0, 1));
+    const behindCopy = lerp(1, 0.3, narrow * clamp(this.progress * 2, 0, 1));
     const gain = lerp(INK_GAIN, 1, this.theme) * sampleTrack(WEIGHT, this.progress) * behindCopy;
     u.uOpacity.value = tier.opacity * gain;
+    // A lit band must not outshine the copy it sits behind.
+    u.uGlowGain.value = lerp(1, 0.1, narrow);
     u.uLineOpacity.value = tier.line * gain * 1.2;
 
     // Camera: distance and height per state, a parallax lean toward the
@@ -464,7 +468,7 @@ export default class Scene {
     u.uCamDist.value = this.camera.position.length();
 
     const wide = clamp((this.camera.aspect - 0.85) / 0.55, 0, 1);
-    const ox = sampleTrack(OFFSET_X, this.progress) * wide;
+    const ox = lerp(sampleTrack(OFFSET_X_NARROW, this.progress), sampleTrack(OFFSET_X, this.progress), wide);
     const oy = sampleTrack(OFFSET_Y, this.progress);
     this.camera.setViewOffset(this.width, this.height, -ox * this.width, oy * this.height, this.width, this.height);
 
