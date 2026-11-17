@@ -309,4 +309,4 @@ export const BOOT_SCRIPT = `
     </script>`;
 
 export const FONT_PRELOAD = `
-    <link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin />`;
+    <link rel="preload" href="/fonts/anybody-var.woff2" as="font" type="font/woff2" crossorigin />`;

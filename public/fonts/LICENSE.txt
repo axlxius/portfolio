@@ -1,9 +1,9 @@
-Archivo (archivo-var.woff2) and JetBrains Mono (jetbrains-mono-var.woff2) are
+Anybody (anybody-var.woff2) and Martian Mono (martian-mono-var.woff2) are
 licensed under the SIL Open Font License, Version 1.1.
 https://openfontlicense.org
 
-Archivo: Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)
-JetBrains Mono: Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)
+Anybody: Copyright 2020 The Anybody Project Authors (https://github.com/Etcetera-Type-Co/Anybody)
+Martian Mono: Copyright 2020 The Martian Mono Project Authors (https://github.com/evilmartians/mono)
 
-Both files are the Latin subsets of the variable fonts as distributed by
-Fontsource (https://fontsource.org).
+Both files are the Latin subsets of the variable fonts (width and weight
+axes) as distributed by Fontsource (https://fontsource.org).

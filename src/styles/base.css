@@ -8,20 +8,21 @@
    ========================================================================== */
 
 @font-face {
-  font-family: 'Archivo';
+  font-family: 'Anybody';
   font-style: normal;
   font-display: swap;
   font-weight: 100 900;
-  font-stretch: 62% 125%;
-  src: url('/fonts/archivo-var.woff2') format('woff2-variations');
+  font-stretch: 50% 150%;
+  src: url('/fonts/anybody-var.woff2') format('woff2-variations');
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'Martian Mono';
   font-style: normal;
   font-display: swap;
   font-weight: 100 800;
-  src: url('/fonts/jetbrains-mono-var.woff2') format('woff2-variations');
+  font-stretch: 75% 112.5%;
+  src: url('/fonts/martian-mono-var.woff2') format('woff2-variations');
 }
 
 :root {
@@ -44,13 +45,20 @@
      keyframes, the live dot. Muted so it reads as a mark, not a fill. */
   --accent: #e07a5f;
 
-  --font: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font: 'Anybody', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --mono: 'Martian Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* The width axis at its two working ends (src/core/type.ts mirrors these).
+     Display type is set wide and light; --mid is for titles that sit between
+     display and reading sizes. */
+  --wide: 140%;
+  --mid: 118%;
+  --narrow: 50%;
 
   --gutter: clamp(1.25rem, 4vw, 4.5rem);
-  /* The hero name runs edge to edge: its width at wght 200 / wdth 125 is
-     about 5.85em, so this is the largest size that still fits the line. */
-  --size-display: calc((100vw - 2 * var(--gutter)) / 6.02);
+  /* The hero name runs edge to edge: in Anybody at wght 200 / wdth 140 it is
+     7.31em wide, so this is the largest size that still fits the line. */
+  --size-display: calc((100vw - 2 * var(--gutter)) / 7.42);
   --size-title: clamp(2.6rem, 9.4vw, 11rem);
   --size-lead: clamp(1.0625rem, 1.15vw + 0.8rem, 1.5rem);
   --size-body: clamp(0.9375rem, 0.3vw + 0.85rem, 1.0625rem);
@@ -198,7 +206,7 @@ button {
 .display,
 .title {
   font-weight: 200;
-  font-stretch: 125%;
+  font-stretch: var(--wide);
   line-height: 0.86;
   letter-spacing: -0.035em;
 }

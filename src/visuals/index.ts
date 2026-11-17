@@ -38,7 +38,7 @@ const hash = (n: number) => {
 
 function label(p: Paint, text: string, x: number, y: number, alpha = 0.6, align: CanvasTextAlign = 'left', size = 3.1) {
   const { ctx, u } = p;
-  ctx.font = `${Math.max(8, size * u)}px "JetBrains Mono", ui-monospace, monospace`;
+  ctx.font = `${Math.max(8, size * u)}px "Martian Mono", ui-monospace, monospace`;
   ctx.textAlign = align;
   ctx.textBaseline = 'middle';
   ctx.fillStyle = p.ink(alpha);
@@ -351,7 +351,7 @@ const growcery: Visual = (p) => {
   // The footprint, as an index falling from 100. An illustration, not a result.
   const index = Math.round(100 - 38 * grow);
   label(p, 'Carbon index', w - 7 * u, 8 * u, 0.6, 'right');
-  ctx.font = `200 ${14 * u}px "Archivo", sans-serif`;
+  ctx.font = `200 ${14 * u}px "Anybody", sans-serif`;
   ctx.textAlign = 'right';
   ctx.textBaseline = 'top';
   ctx.fillStyle = p.ink(1);
@@ -454,11 +454,11 @@ const clinic: Visual = (p) => {
     ctx.fill();
     ctx.globalCompositeOperation = 'destination-out';
     ctx.fillStyle = '#000';
-    ctx.font = `${Math.max(8, 2.9 * u)}px "JetBrains Mono", ui-monospace, monospace`;
+    ctx.font = `${Math.max(8, 2.9 * u)}px "Martian Mono", ui-monospace, monospace`;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText('O T P', -bw + 3 * u, -bh + 4 * u);
-    ctx.font = `${5.4 * u}px "JetBrains Mono", ui-monospace, monospace`;
+    ctx.font = `${5.4 * u}px "Martian Mono", ui-monospace, monospace`;
     for (let i = 0; i < 6; i++) {
       const shown = t > 4.0 + i * 0.22;
       const digit = Math.floor(hash(loop * 7.3 + i * 1.9) * 10);

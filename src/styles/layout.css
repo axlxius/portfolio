@@ -518,7 +518,7 @@ html.js[data-motion='full'] .reel-count {
   display: block;
   font-size: clamp(1.8rem, 4.4vw, 4rem);
   font-weight: 200;
-  font-stretch: 125%;
+  font-stretch: var(--wide);
   letter-spacing: -0.035em;
   line-height: 0.95;
 }
@@ -666,7 +666,7 @@ html.js[data-motion='full'] .reel-meta {
   margin-top: 0.4rem;
   font-size: clamp(1.4rem, 3vw, 2.6rem);
   font-weight: 300;
-  font-stretch: 112%;
+  font-stretch: var(--mid);
   letter-spacing: -0.025em;
   line-height: 1.1;
   text-wrap: balance;
@@ -751,7 +751,7 @@ html.js[data-motion='full'] .tl-keys {
   bottom: 1.4rem;
   font-size: clamp(2rem, 5vw, 5.5rem);
   font-weight: 200;
-  font-stretch: 125%;
+  font-stretch: var(--wide);
   letter-spacing: -0.04em;
   line-height: 0.9;
   transform: translateX(-50%);
@@ -818,7 +818,7 @@ html.js[data-motion='full'] .tl-title {
   gap: 0 0.5em;
   font-size: clamp(2rem, 5.6vw, 6.6rem);
   font-weight: 600;
-  font-stretch: 125%;
+  font-stretch: var(--wide);
   letter-spacing: -0.035em;
   line-height: 1.02;
   text-transform: uppercase;

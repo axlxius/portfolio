@@ -127,7 +127,7 @@ export function measureDot(char: HTMLElement): Dot | null {
   // Canvas takes the width axis as a keyword; pick the nearest.
   const keywords: Array<[number, CanvasFontStretch]> = [
     [50, 'ultra-condensed'], [62.5, 'extra-condensed'], [75, 'condensed'], [87.5, 'semi-condensed'],
-    [100, 'normal'], [112.5, 'semi-expanded'], [125, 'expanded'],
+    [100, 'normal'], [112.5, 'semi-expanded'], [125, 'expanded'], [150, 'extra-expanded'],
   ];
   const nearest = keywords.reduce((a, b) => (Math.abs(b[0] - stretch) < Math.abs(a[0] - stretch) ? b : a));
   const baseline = canvas.height - pad - size * 0.3;
