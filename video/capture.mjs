@@ -109,6 +109,8 @@ function instants(f, scroll) {
 }
 
 const browser = await chromium.launch({
+  // Set CHROME_PATH to use a Chromium other than the one Playwright installed.
+  executablePath: process.env.CHROME_PATH || undefined,
   args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
 });
 const context = await browser.newContext({
@@ -154,7 +156,7 @@ const manifest = { fps: FPS, qa: QA_ONLY, main: {}, case: {}, cursor: {} };
   }, STOPS);
 
   const targets = await page.evaluate((workY) => {
-    const rows = [...document.querySelectorAll('[data-strand]')].map((row) => {
+    const rows = [...document.querySelectorAll('[data-project]')].map((row) => {
       const name = row.querySelector('.work-name').getBoundingClientRect();
       const r = row.getBoundingClientRect();
       return {

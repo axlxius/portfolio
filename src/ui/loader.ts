@@ -59,7 +59,7 @@ export function playIntro(onDone: () => void) {
   document.body.append(loader);
 
   const words = lead
-    ? (SplitText.create(lead, { type: 'words', wordsClass: 'word' }).words as HTMLElement[])
+    ? (SplitText.create(lead, { type: 'words', wordsClass: 'word', aria: 'none' }).words as HTMLElement[])
     : [];
 
   const state = { value: 0, assemble: 0 };

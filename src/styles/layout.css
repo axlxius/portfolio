@@ -537,7 +537,7 @@ html[data-motion='full'] .intro-scroll-line {
   font-stretch: 125%;
   letter-spacing: -0.03em;
   color: transparent;
-  -webkit-text-stroke: 1px var(--fg-3);
+  -webkit-text-stroke: 1px var(--fg-2);
   transition: color 0.5s var(--ease), -webkit-text-stroke-color 0.5s var(--ease);
 }
 

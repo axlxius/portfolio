@@ -1,5 +1,16 @@
 # Showcase video
 
+> **Needs re-cutting.** This film was timed against the previous version of
+> the site. The site has since been rebuilt (new sections, an intro sequence,
+> GSAP-driven reveals), so the shot timings, cursor targets and captions in
+> `timeline.mjs` describe a layout that no longer exists. The capture script
+> still runs against the new markup, but GSAP keeps its own clock, so its
+> animations are not yet stepped by the virtual clock described below. Treat
+> the pipeline as a starting point for a new cut, not a finished one.
+>
+> `og.mjs` in this folder is current: it renders `public/og-image.png` from
+> the running site (`node og.mjs`, with the preview server up).
+
 A 50-second walkthrough of the site for people who will not scroll it
 themselves. It is rendered from the real site, frame by frame, so it stays
 true to what the site does and can be re-rendered whenever the site changes.

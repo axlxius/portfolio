@@ -93,6 +93,12 @@ const pinned = params.has('p') ? Number(params.get('p')) : null;
 async function startScene() {
   const canvas = qs<HTMLCanvasElement>('[data-scene]');
   if (!canvas) return;
+  // Ask for WebGL on a throwaway canvas first. Where it is missing, the scene
+  // module is never downloaded and nothing is logged.
+  if (!document.createElement('canvas').getContext('webgl2')) {
+    root.setAttribute('data-no-webgl', '');
+    return;
+  }
   try {
     const { default: Scene } = await import('./scene/Scene.ts');
     const scene = new Scene(canvas);

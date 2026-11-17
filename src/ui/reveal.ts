@@ -117,6 +117,8 @@ export function createReveals() {
     SplitText.create(block, {
       type: 'lines',
       mask: 'lines',
+      // Lines read fine as they are; an aria-label is not allowed on a <p>.
+      aria: 'none',
       linesClass: 'line',
       autoSplit: true,
       onSplit(self) {

@@ -56,15 +56,18 @@ export function createHeader(sections: HTMLElement[]) {
 
   links[0]?.setAttribute('aria-current', 'true');
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) setCurrent(sections.indexOf(entry.target as HTMLElement));
-      }
-    },
-    { rootMargin: '-45% 0px -45% 0px' }
-  );
-  sections.forEach((s) => observer.observe(s));
+  // The current section is the last one whose top has passed the middle of
+  // the viewport. Section tops are cached and re-read only when layout moves,
+  // so finding it each frame costs nothing, and a jump past several sections
+  // (an anchor link, a restored scroll position) still lands on the right one.
+  let tops: number[] = [];
+  const measure = () => {
+    tops = sections.map((s) => s.getBoundingClientRect().top + window.scrollY);
+  };
+  measure();
+  window.addEventListener('resize', measure, { passive: true });
+  window.addEventListener('load', measure);
+  new ResizeObserver(measure).observe(document.body);
 
   // --- Disclosure -------------------------------------------------------------
   function setOpen(open: boolean) {
@@ -116,6 +119,11 @@ export function createHeader(sections: HTMLElement[]) {
   return {
     /** Call once per frame. */
     update() {
+      const mid = window.scrollY + window.innerHeight / 2;
+      let now = 0;
+      for (let i = 1; i < tops.length; i++) if (tops[i] <= mid) now = i;
+      setCurrent(now);
+
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const p = max > 0 ? window.scrollY / max : 0;
       fill.style.setProperty('--progress', p.toFixed(4));

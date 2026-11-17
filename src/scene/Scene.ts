@@ -464,7 +464,7 @@ export default class Scene {
     u.uCamDist.value = this.camera.position.length();
 
     const wide = clamp((this.camera.aspect - 0.85) / 0.55, 0, 1);
-    const ox = sampleTrack(OFFSET_X, this.progress) * wide * (1 - this.alt * 0.12);
+    const ox = sampleTrack(OFFSET_X, this.progress) * wide;
     const oy = sampleTrack(OFFSET_Y, this.progress);
     this.camera.setViewOffset(this.width, this.height, -ox * this.width, oy * this.height, this.width, this.height);
 

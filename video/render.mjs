@@ -48,7 +48,7 @@ function run(cmd, args, input) {
   });
 }
 
-const browser = await chromium.launch();
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined });
 const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
 page.on('pageerror', (e) => console.error('compositor:', e.message));
 const manifest = QA_ONLY ? 'out/manifest-qa.json' : 'out/manifest.json';

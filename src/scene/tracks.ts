@@ -10,7 +10,7 @@ export const CAMERA_Y = [0.0, 0.25, 0.0, 0.0, 0.0, 0.0];
 // Where the object sits on screen, as a fraction of the viewport: positive x
 // is right, positive y is up. Reading sections push it into the open right
 // third so type and particles do not fight. Fades to centre on narrow screens.
-export const OFFSET_X = [0.25, 0.29, 0.29, 0.04, 0.24, 0.24];
+export const OFFSET_X = [0.25, 0.31, 0.3, 0.04, 0.24, 0.24];
 export const OFFSET_Y = [0.13, 0.0, 0.0, -0.06, 0.0, 0.0];
 
 // Per-point morph offset: how far the wave of re-forming spreads.
