@@ -1,7 +1,8 @@
 # Portfolio
 
-A black-and-white portfolio built around one particle cloud that reforms into a
-different shape for every section.
+A portfolio built like a short film. Scrolling moves a playhead through five
+scenes, each choreographed to the scroll and joined to the next by a match cut,
+with one particle cloud as the thread that runs through all of them.
 
 **Live:** <https://alexius-lee.vercel.app> · **Repo:** <https://github.com/axlxius/portfolio>
 
@@ -47,13 +48,13 @@ copy.
 | --- | --- |
 | Email, GitHub, LinkedIn, resume | `LINKS` |
 | Page title, link-preview image | `META` |
-| Name, intro paragraph, tags | `INTRO` |
+| Name, title-card line, tags | `INTRO` (`short` is the line on the title card) |
 | Projects | `PROJECTS` |
 | Roles | `ROLES` |
 | Skill groups | `SKILLS` |
 | Education, certifications | `EDUCATION`, `CERTIFICATIONS` |
 | Contact copy and links | `CONTACT` |
-| The words in the big moving line | `MARQUEE` |
+| Small scene headings (Experience, Toolkit, Credits) | `LABELS` |
 
 A link that does not exist yet is written as `TODO` (which is `null`). Nothing
 is rendered for it, so a missing live URL never shows as a dead button. Search
@@ -61,13 +62,13 @@ the file for `TODO` to see what is still open.
 
 Role and project copy mirrors the resume. Keep the two in step.
 
-Two things in the content file are judgement calls worth checking:
+The page is deliberately brief: each project is a title and one line, each
+role a title and its dates. Fuller copy stays in the content file for the
+project overlay and the meta description, and `ROLES[].body` is kept for the
+resume but not shown.
 
-- **`ROLES[].skills`** is the small tag line that appears when a role is
-  hovered. It is drawn only from the Stack lists (a test enforces that), but
-  which skills belong to which role is my reading of the role descriptions.
-- **`PROJECTS[].tech` and `.context`** come from each project's write-up.
-  `pay2live` has no write-up, so it claims neither.
+`PROJECTS[].tech` and `.context` come from each project's write-up and appear
+in the project overlay. `pay2live` has no write-up, so it claims neither.
 
 ### Adding a project
 
@@ -76,9 +77,12 @@ Two things in the content file are judgement calls worth checking:
    owns one band of the vase, top to bottom in list order. `npm test` fails
    with a message telling you to do this if you forget.
 3. If it needs a new visual, add one in `src/visuals/index.ts` (the drawing in
-   the preview card and the overlay) and a takeover shape in
-   `src/scene/projects.ts` (what the cloud becomes on hover), then add the id
-   to `VisualId` in the content file.
+   the overlay) and a takeover shape in `src/scene/projects.ts` (what the
+   cloud draws while the project's title card is up), then add the id to
+   `VisualId` in the content file.
+
+The work reel gives every project one beat of scroll, so a seventh project
+simply makes the scene a beat longer.
 
 ### Project write-ups
 
@@ -87,7 +91,37 @@ HTML, built with `src/case.ts` and `src/styles/case.css`. To add one, copy an
 existing `work/<slug>/index.html`, add the slug to `pages` in `vite.config.ts`
 and to `public/sitemap.xml`, and set the project's `writeUp` in the content
 file. The overlay then shows a "Read the write-up" button, and with JavaScript
-off the project's row links straight to the page.
+off the project's title links straight to the page.
+
+## The scenes
+
+The page reads as a film: a HUD shows the scene and a running timecode, and a
+scrubber along the bottom carries a playhead and one mark per scene (the marks
+are the section links). Scenes one to three are pinned and their choreography
+is scrubbed by the scroll, so scrolling back plays everything in reverse.
+
+| Scene | File | What happens |
+| --- | --- | --- |
+| 01 Title | `src/scenes/title.ts` | The name pulls apart across the screen, condensing and thickening as it goes. Everything but the "i" drops away, and the dot of the "i" grows into a circle that fills the screen. |
+| 02 Work | `src/scenes/reel.ts` | In negative. One title card per project: its letters rise in, its line follows, it holds, and it lifts away. The cloud draws each project's figure while its card is up. |
+| 03 Experience | `src/scenes/timeline.ts` | A hairline draws across the screen and thickens until it fills it: back to positive. It becomes a timeline; a playhead runs along it, lighting each keyframe and bringing up that role. |
+| 04 Toolkit | `src/scenes/kit.ts` | Each skill group is one line of outlined type; alternate lines slide in opposite directions with the scroll. |
+| 05 Contact | page markup + `src/ui/reveal.ts` | Credits (education, certifications) roll up like end credits, then "Get in touch". The cloud tangles into a tree and resolves into a single line at the very end. |
+
+The two match cuts live in `src/scenes/wipes.ts`. A wipe is drawn beneath the
+particles in the colour the page is about to become; once it covers the
+screen the colour tokens flip underneath it (`data-invert` on `<html>`) and it
+is hidden, so the swap is never seen. To start the circle exactly on the dot of
+the "i", the dot is found by drawing the letter twice on a canvas, dotted and
+dotless, and keeping the pixels that differ.
+
+`src/main.ts` is the director: it builds the scenes inside a GSAP context,
+maps the scroll onto the cloud's morph (each pinned scene holds its form for
+the length of its pin, and the cloud reforms in the scroll between scenes),
+and tears it all down again if motion is reduced.
+
+Scene lengths are the `end` values of each scene's ScrollTrigger: `+=190%` for
+the title, one 95% beat per project for the reel, `+=320%` for the timeline.
 
 ## How the 3D works
 
@@ -116,16 +150,16 @@ the scene mid-morph however far its ends travel. The vase and the column put
 each strand at the same angle around the axis, so Work to Experience is a
 vertical stretch rather than points crossing the shape.
 
-`src/scroll/progress.ts` maps scroll position onto that timeline. Sections have
-very different heights, so it anchors one stop per state at the scroll offset
-where that section sits under the middle of the viewport.
+With motion, the director in `src/main.ts` maps the scroll onto that timeline
+from the scenes' pins. With reduced motion, `src/scroll/progress.ts` anchors
+one stop per state where each section sits under the middle of the viewport.
 
-**Project takeover.** Hovering a project lights its band of the vase at once.
-If the pointer stays for a quarter of a second, the whole cloud reforms into a
-figure for that project (`src/scene/projects.ts`): a knot, a bar chart, a stack
-of ruled sheets, a sprout, two crossing lines, a calendar. The figures live in
-two spare attribute slots that cross-fade, so moving from one project to the
-next never pops.
+**Project figures.** While a project's title card is up in the work reel, the
+whole cloud reforms into a figure for it (`src/scene/projects.ts`): a knot, a
+bar chart, a stack of ruled sheets, a sprout, two crossing lines, a calendar.
+The figures live in two spare attribute slots that cross-fade, so moving from
+one project to the next never pops. The camera also pushes into the cloud
+through the title's wipe (`Scene.setZoom`).
 
 **Pointer.** The shader pushes points away from the pointer and swirls them
 sideways, drags the ones near where the pointer just was, and sends an
@@ -171,9 +205,10 @@ to edit there.
 | Which forms turn and which face the camera | `SPIN` in `src/scene/tracks.ts` |
 | Width kept in frame on narrow screens | `FIT_WIDTH` in `src/scene/tracks.ts` |
 | Vase, column, ribbon and tree proportions | `VASE` / `COLUMN` / `RIBBON` / `TREE` in `src/scene/shapes.ts` |
-| How long a hover waits before the takeover | `DWELL` in `src/sections/work.ts` |
 | Pointer push, swirl, shockwave | the vertex shader in `src/scene/shaders.ts` |
-| Spring and damping of the skills field | the constants at the top of `src/sections/stack.ts` |
+| Length and choreography of each scene | the timeline in each file under `src/scenes/` |
+| Running time shown in the timecode | `RUNTIME` in `src/scenes/hud.ts` |
+| The accent colour | `--accent` in `src/styles/base.css` |
 
 Three URL parameters help while tuning:
 
@@ -189,8 +224,9 @@ src/
   data/content.ts     all copy and links
   markup/page.ts      the page as string templates, run at build time
   scene/              renderer, morph targets, takeover shapes, shaders, tracks
-  sections/           behaviour for Intro, Work, Experience, Stack, Contact
-  ui/                 cursor, header, loader, overlay, preview card, theme, sound
+  scenes/             the five scenes, the wipes between them, and the HUD
+  sections/           the title card's pointer effect and the contact block
+  ui/                 cursor, loader, overlay, reveals, theme, sound, toast
   visuals/            the six generative project visuals
   scroll/             smooth scroll and the scroll-to-morph mapping
   core/               motion preference, easing, small helpers
@@ -201,27 +237,28 @@ video/                the showcase film pipeline and the link-preview image scri
 
 ## Accessibility and fallbacks
 
-- All content is real markup in the shipped HTML. With JavaScript off the page
-  reads completely, the section nav is a row of links and project rows link to
-  their write-ups. Content is only hidden for a reveal when a script is there
+- All content is real markup in the shipped HTML. With JavaScript off the
+  scenes are ordinary stacked sections, the scrubber is a row of links and
+  project titles link to their write-ups. Content is only hidden for a reveal when a script is there
   to show it again; if the main script never boots, a failsafe un-hides it.
 - **Reduced motion** is respected from the OS setting and from the Motion
-  switch in the header, which persists. In that mode there is no intro, no
-  smooth scroll, no custom cursor, no drift, parallax or pointer physics, and
-  everything is visible from the start. The cloud still tracks the scroll, so
-  the page stays coherent.
-- Focus is visible everywhere. Project rows respond to keyboard focus as they
-  do to hover, and the arrow keys move between them. The project overlay is a
-  modal dialog: focus moves in, is trapped, and returns to the row; Esc, the
-  browser's back button and a downward swipe all close it.
+  switch in the HUD, which persists. In that mode nothing is pinned or
+  scrubbed: the scenes become plain sections, and there is no intro, no wipe,
+  no smooth scroll, no custom cursor, no drift or pointer physics. The switch
+  takes effect without a reload, in either direction.
+- Focus is visible everywhere. Tabbing to a project's title card scrolls the
+  reel to its beat, so keyboard users see what they focus. The project overlay
+  is a modal dialog: focus moves in, is trapped, and returns to the card; Esc,
+  the browser's back button and a downward swipe all close it.
+- Hidden title cards and roles are faded, never removed, so a screen reader
+  reads every project and role in order.
 - Text greys are 10:1 and 5.3:1 on the background in both themes. An automated
   axe-core pass reports no violations on the home page (both themes, with and
   without motion), with the overlay open, or on a write-up.
 - If WebGL is missing, the scene module is never downloaded and the page reads
-  normally. The corner dot grid is plain 2D canvas and stays.
-- The custom cursor, the preview card and hover effects are bound only for a
-  mouse. On touch, the project row in view is the active one and a tap opens
-  the overlay.
+  normally; the scenes and wipes still play.
+- The custom cursor and hover effects are bound only for a mouse. On touch, a
+  tap on a title card opens its overlay.
 - Rendering parks while the tab is hidden; device pixel ratio is capped at 2.
 
 ## Performance
@@ -238,54 +275,40 @@ loaded after first paint, and the fonts are self-hosted and preloaded.
 
 The decisions behind the build, in the order someone is likely to ask.
 
-**Why keep it black and white.** One ink, one paper, and every other tone is
-that ink at reduced alpha. With no colour to lean on, hierarchy has to come
-from scale, weight and space, which is the harder and more honest way to do it.
-It also means dark mode is a literal inversion rather than a second design.
+**Why a film.** The brief was a site that shows creative range rather than one
+that explains it. Film grammar does that without words: scenes, a running
+timecode, a playhead, match cuts. The scroll is the playhead, so the visitor
+directs the pace, and scrubbing back plays everything in reverse, which is the
+quickest proof that none of it is a canned animation.
 
-**Why one object instead of five scenes.** The site's argument is continuity:
-the same matter, rearranged. The gyroscope is energy with no structure. It
-tightens into a vase that *is* the project list, stretches into a column that
-*is* the timeline, unrolls into a ribbon behind the skills, and ends as a
-tangle that resolves into a single line as the scroll runs out. Because the
-points persist, every transition reads as reorganisation, never as a cut.
+**Why match cuts.** A cut that carries something across (the dot of the "i"
+becoming the circle that opens the next scene, the timeline's hairline
+thickening into the wipe back) makes two scenes feel like one continuous piece.
+It is the signature move of title design, and it costs the visitor nothing.
 
-**Why the cloud sits to the right.** The first version put the object behind
-the text, where it muddied the copy. Now the reading column keeps to the left
-two thirds and the object owns the right third. Type and particles each get
-clear air, and the page reads as a spread with an illustration rather than a
-poster with a caption.
+**Why the name comes apart.** A name set in a variable font has two axes to
+play with. Pulling the letters across the screen while they condense and
+thicken shows the typeface doing something only a variable font can, and it
+turns the most static thing on any portfolio into the first piece of motion.
 
-**Why a hover waits before the cloud reforms.** Activating a project does
-three things in rising order of commitment: the row responds at once, its band
-of the vase lights, and only after a quarter of a second does the whole cloud
-reform. Skimming the list stays calm; lingering is rewarded.
+**Why one card at a time.** A list asks the reader to compare; a reel asks
+them to watch. Each project gets the whole screen for a beat, with one line of
+copy, which is all a first look needs. The detail is one click away.
 
-**Why the project visuals are drawings, not screenshots.** Most of the
-projects are not public, and a mocked screenshot implies a product that the
-viewer cannot check. A generative drawing of the *idea* (two lines crossing, a
-plant growing as a number falls) is honest about being an illustration, and it
-is something built rather than captured.
+**Why black and white, and one accent.** With no colour to lean on, hierarchy
+comes from scale, weight and timing. The single accent marks only what is
+live: the playhead and the keyframes it has passed. Anything more would compete
+with the motion.
 
-**Why the theme wipes from the toggle.** The switch is an action with a
-source, so the change spreads from where it was made. Underneath, the
-particles move from adding light to laying down ink, which is the same idea
-expressed in the renderer.
+**Why the cloud stays.** The particle object is the one thing on screen in
+every scene. Each scene reshapes it (orbit, vase, project figures, column,
+ribbon, tree, line), so it works like a recurring character: the page changes
+around it, and it changes with the page.
 
-**Why the skills can be thrown around.** A skills list is the driest part of
-any portfolio. Making each word a physical object says "I enjoy tinkering"
-more convincingly than the sentence does. The real list never leaves the DOM,
-so nothing is lost for a screen reader or with motion off.
-
-**Why the name is exactly as wide as the page.** The display size is computed
-from the viewport so "Alexius Lee" runs edge to edge at every width. It is the
-largest the name can be without being cut, and it turns the name into the
-page's top rule.
-
-**What was deliberately left out.** No section snapping, because taking the
-scroll away from the reader costs more than it gives. No chromatic aberration,
-because it is a colour effect in a site with no colour. No permission prompt
-for device tilt on iOS, because a background effect does not earn a prompt.
+**What was deliberately left out.** No scroll-jacking beyond the pins: the
+wheel always moves the page at its natural speed. No sound on by default. No
+chromatic aberration, because it is a colour effect in a site with almost no
+colour.
 
 ## Known gaps
 
@@ -293,8 +316,8 @@ for device tilt on iOS, because a background effect does not earn a prompt.
   still hand-written HTML.
 - **Project links.** Only this site has a live URL and a repo. The others are
   `TODO` in the content file and show no button until filled in.
-- **Tested in Chromium only.** The checks here (72 scripted browser checks,
-  axe-core, Lighthouse) all ran in Chromium. Safari and Firefox have not been
+- **Tested in Chromium only.** The checks here (57 scripted browser checks,
+  axe-core) all ran in Chromium. Safari and Firefox have not been
   run. The theme wipe and the overlay's title transition use the View
   Transitions API and fall back to a plain switch where it is missing.
 - **Frame rate on real hardware is unmeasured.** The build machine has no GPU,
@@ -302,6 +325,8 @@ for device tilt on iOS, because a background effect does not earn a prompt.
   If a device struggles, lower its tier in `chooseTier`.
 - **Device tilt** works where the browser reports orientation without asking
   (Android). On iOS the scene does not tilt.
-- **The showcase film** in `video/` was cut for the previous version of the
-  site. Its capture script runs, but the timings and captions describe the old
-  layout and need re-cutting. See `video/README.md`.
+- **Pinned scenes on phones.** Pins and scrubs run on touch screens too and
+  were checked at 390px wide, but only in an emulator. Real iOS Safari, with
+  its collapsing address bar, has not been tried.
+- **The showcase film** in `video/` was cut for an earlier version of the
+  site and needs re-cutting. See `video/README.md`.

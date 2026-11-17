@@ -40,6 +40,9 @@
   /* Inverted surfaces: the preview card, filled buttons, the toast. */
   --accent-invert: var(--fg);
   --on-invert: var(--bg);
+  /* The only colour on the site, used in small doses: the playhead, the
+     keyframes, the live dot. Muted so it reads as a mark, not a fill. */
+  --accent: #e07a5f;
 
   --font: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -63,7 +66,10 @@
   color-scheme: light;
 }
 
-:root[data-theme='dark'] {
+/* Dark is the theme, or light inverted by a scene wipe (data-invert is set
+   by src/scenes/wipes.ts while a scene plays in negative). */
+:root[data-theme='dark']:not([data-invert]),
+:root[data-theme='light'][data-invert] {
   --bg-rgb: 0 0 0;
   --fg-rgb: 255 255 255;
   color-scheme: dark;

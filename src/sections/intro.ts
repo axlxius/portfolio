@@ -56,7 +56,8 @@ export function createHeroName(chars: HTMLElement[]) {
 
   gsap.ticker.add((_time, deltaMs) => {
     // Nothing to do once the name has scrolled away.
-    if (window.scrollY > window.innerHeight || !ready) return;
+    // Only on the title card at rest: once it scrolls, the scene owns the letters.
+    if (window.scrollY > 24 || !ready) return;
     const k = damp(9, Math.min(deltaMs / 1000, 0.05));
     const live = pointer.active && !motion.reduced;
     if (live && stale) measure();

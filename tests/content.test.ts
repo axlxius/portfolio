@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { PROJECTS, ROLES, SECTIONS, SKILLS } from '../src/data/content.ts';
+import { CERTIFICATIONS, EDUCATION, PROJECTS, ROLES, SECTIONS, SKILLS } from '../src/data/content.ts';
 import { renderBody, renderMeta } from '../src/markup/page.ts';
 import { BANDS, ROLES as ROLE_SEGMENTS, STATE_COUNT } from '../src/scene/shapes.ts';
 
@@ -25,19 +25,27 @@ test('project slugs are unique', () => {
   assert.equal(new Set(PROJECTS.map((p) => p.slug)).size, PROJECTS.length);
 });
 
-test('the generated page contains every piece of copy', () => {
+test('the generated page carries every project, role, skill and credit', () => {
+  // The page is deliberately brief: role descriptions live in the resume.
   const html = renderBody();
   const text = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
   for (const project of PROJECTS) {
-    assert.ok(html.includes(text(project.title)));
-    assert.ok(html.includes(text(project.note)));
+    assert.ok(html.includes(text(project.title)), project.title);
+    assert.ok(html.includes(text(project.note)), project.note);
   }
   for (const role of ROLES) {
-    assert.ok(html.includes(text(role.title)));
-    assert.ok(html.includes(text(role.body)));
+    assert.ok(html.includes(text(role.title)), role.title);
+    assert.ok(html.includes(text(role.dates)), role.dates);
   }
-  for (const group of SKILLS) for (const item of group.items) assert.ok(html.includes(text(item)));
+  for (const group of SKILLS) for (const item of group.items) assert.ok(html.includes(text(item)), item);
+  for (const e of EDUCATION) assert.ok(html.includes(text(e.text)), e.text);
+  for (const c of CERTIFICATIONS) assert.ok(html.includes(text(c.name)), c.name);
   for (const section of SECTIONS) assert.ok(html.includes(`id="${section.id}"`));
+});
+
+test('every scene has a scrubber mark that links to it', () => {
+  const html = renderBody();
+  for (const section of SECTIONS) assert.ok(html.includes(`href="#${section.id}" data-mark="${section.id}"`));
 });
 
 test('headings are in order: one h1, then h2 per section, h3 beneath', () => {

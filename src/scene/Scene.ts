@@ -106,6 +106,8 @@ export default class Scene {
   private velocity = 0;
   private velocityTarget = 0;
   private assemble = 1;
+  private zoom = 1;
+  private zoomTarget = 1;
   private theme = 1; // 1 = dark (additive light), 0 = light (ink)
   private themeTarget = 1;
 
@@ -304,6 +306,11 @@ export default class Scene {
     this.assemble = clamp(value, 0, 1);
   }
 
+  /** Push the camera in (below 1) or out (above 1) from its framing. */
+  setZoom(factor: number) {
+    this.zoomTarget = clamp(factor, 0.3, 2);
+  }
+
   /** Light one project's band of the vase (list order). Null releases it. */
   setBand(index: number | null) {
     this.bandTarget = index == null ? -1 : index;
@@ -379,6 +386,7 @@ export default class Scene {
     const k = (rate: number) => (still ? 1 : damp(rate, dt));
 
     this.progress = lerp(this.progress, this.progressTarget, k(5.5));
+    this.zoom = lerp(this.zoom, this.zoomTarget, k(6));
     this.velocity = lerp(this.velocity, still ? 0 : this.velocityTarget, k(8));
     this.theme = lerp(this.theme, this.themeTarget, still ? 1 : damp(7, dt));
 
@@ -459,7 +467,7 @@ export default class Scene {
     // pointer (or the device tilt), and a view offset that seats the object
     // in the open part of the layout.
     const baseZ = sampleTrack(CAMERA_Z, this.progress) * this.frameScale;
-    const z = fitCameraZ(baseZ, sampleTrack(FIT_WIDTH, this.progress), this.camera.fov, this.camera.aspect * 0.62);
+    const z = fitCameraZ(baseZ, sampleTrack(FIT_WIDTH, this.progress), this.camera.fov, this.camera.aspect * 0.62) * this.zoom;
     const camY = sampleTrack(CAMERA_Y, this.progress);
     const leanX = still ? 0 : this.pointer.x * this.pointerStrength + this.tilt.x;
     const leanY = still ? 0 : this.pointer.y * this.pointerStrength - this.tilt.y;

@@ -7,7 +7,8 @@ import { motion } from '../core/motion.ts';
  * directly, so nothing else on the page restyles.
  */
 export function createHeadingSkew() {
-  const headings = qsa('.title, .display');
+  // Not the title card's name: its letters are choreographed by the scene.
+  const headings = qsa('.title, [data-skew]');
   let skew = 0;
   let applied = 0;
 
