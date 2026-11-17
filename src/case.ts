@@ -10,6 +10,7 @@ import gsap from 'gsap';
 import { EASE } from './core/ease.ts';
 import { qsa } from './core/env.ts';
 import { motion } from './core/motion.ts';
+import { WIDE } from './core/type.ts';
 import { createCursor } from './ui/cursor.ts';
 import { createGrain } from './ui/grain.ts';
 import { createTheme } from './ui/theme.ts';
@@ -26,7 +27,7 @@ qsa('[data-reveal]').forEach((heading) => {
   if (!inner || motion.reduced) return;
   gsap.fromTo(
     inner,
-    { yPercent: 108, fontStretch: '78%' },
-    { yPercent: 0, fontStretch: '125%', duration: 1.25, ease: EASE, clearProps: 'transform,fontStretch' }
+    { yPercent: 108, fontStretch: '72%' },
+    { yPercent: 0, fontStretch: WIDE, duration: 1.25, ease: EASE, clearProps: 'transform,fontStretch' }
   );
 });

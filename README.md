@@ -209,6 +209,9 @@ to edit there.
 | Length and choreography of each scene | the timeline in each file under `src/scenes/` |
 | Running time shown in the timecode | `RUNTIME` in `src/scenes/hud.ts` |
 | The accent colour | `--accent` in `src/styles/base.css` |
+| Typefaces | `@font-face`, `--font` and `--mono` in `src/styles/base.css`; files in `public/fonts/` |
+| Display width, and how far the title squeezes | `--wide` / `--mid` / `--narrow` in `src/styles/base.css`, mirrored in `src/core/type.ts` |
+| Size of the edge-to-edge name | `--size-display` in `src/styles/base.css` (divides by the name's width in em) |
 
 Three URL parameters help while tuning:
 
@@ -267,8 +270,8 @@ Lighthouse on the production build, desktop profile, on a machine with no GPU:
 
 | Run | Performance | Accessibility | Best Practices | SEO |
 | --- | --- | --- | --- | --- |
-| WebGL off (the site's own code) | 100 | 100 | 100 | 100 |
-| WebGL on, software renderer | 72–83 | 100 | 100 | 100 |
+| WebGL off (the site's own code) | 99–100 | 100 | 100 | 100 |
+| WebGL on, software renderer | 70–83 | 100 | 100 | 100 |
 
 The gap is the software renderer, not the page. A trace of the WebGL run shows
 its one long task is a single 640ms `GPUTask`: graphics work that a real GPU
@@ -299,6 +302,13 @@ It is the signature move of title design, and it costs the visitor nothing.
 play with. Pulling the letters across the screen while they condense and
 thicken shows the typeface doing something only a variable font can, and it
 turns the most static thing on any portfolio into the first piece of motion.
+
+**Why Anybody.** The whole site moves on the width axis, so the typeface is
+chosen for it. Anybody runs from 50% to 150% width, twice the range of most
+variable sans faces: set wide and light it reads as a studio wordmark, and
+squeezed to its narrowest and heaviest it becomes a poster face. One family
+covers display, reading and that full transformation. Martian Mono carries
+the timecode and labels, where a monospace reads as an instrument.
 
 **Why one card at a time.** A list asks the reader to compare; a reel asks
 them to watch. Each project gets the whole screen for a beat, with one line of

@@ -164,7 +164,7 @@
   margin-top: 0.35rem;
   font-size: clamp(1.35rem, 2.6vw, 2.25rem);
   font-weight: 300;
-  font-stretch: 112%;
+  font-stretch: var(--mid);
   letter-spacing: -0.025em;
   line-height: 1.1;
   transition: padding-inline-start 0.45s var(--ease);

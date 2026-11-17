@@ -5,6 +5,7 @@ import { SplitText } from 'gsap/SplitText';
 import { EASE } from '../core/ease.ts';
 import { qsa } from '../core/env.ts';
 import { motion } from '../core/motion.ts';
+import { WIDE } from '../core/type.ts';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -52,10 +53,10 @@ export function createReveals() {
     if (!inner) return;
     gsap.fromTo(
       inner,
-      { yPercent: 108, fontStretch: '78%' },
+      { yPercent: 108, fontStretch: '72%' },
       {
         yPercent: 0,
-        fontStretch: '125%',
+        fontStretch: WIDE,
         duration: 1.25,
         ease: EASE,
         scrollTrigger: { id: 'reveal-title', trigger: heading, start: 'top 88%', once: true },

@@ -24,9 +24,9 @@ const page = await browser.newPage({
 await page.goto(URL_, { waitUntil: 'load' });
 await page.addStyleTag({
   content: `
-    .chrome, .progress, .grain, .dotgrid, .shade, .cursor, .intro-scroll, .chips { display: none !important; }
-    .section--intro { min-height: 630px; padding-block-end: 64px; }
-    .lead { font-size: 26px; max-width: 30ch; color: rgb(255 255 255 / 0.72); }
+    .hud, .scrubber, .playhead, .grain, .shade, .cursor, .title-top, .title-cue { display: none !important; }
+    .title-stage { min-height: 630px; padding-bottom: 64px; }
+    .title-line { font-size: 26px; max-width: 30ch; color: rgb(255 255 255 / 0.72); }
   `,
 });
 await page.evaluate(() => document.fonts.ready);

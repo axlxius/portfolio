@@ -286,7 +286,7 @@ html.is-loading .playhead {
 .overlay-title {
   font-size: clamp(2.6rem, 6.4vw, 7.5rem);
   font-weight: 200;
-  font-stretch: 125%;
+  font-stretch: var(--wide);
   line-height: 0.9;
   letter-spacing: -0.035em;
   margin-top: 1rem;

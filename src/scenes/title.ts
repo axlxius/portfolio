@@ -2,6 +2,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { qs, qsa } from '../core/env.ts';
+import { NARROW, WIDE } from '../core/type.ts';
 import type { Dot, Wipes } from './wipes.ts';
 import { measureDot } from './wipes.ts';
 
@@ -41,7 +42,7 @@ export function createTitleScene({ chars, wipes, onZoom }: TitleOptions): Scroll
   const iIndex = chars.indexOf(iChar);
 
   const name = chars[0].closest<HTMLElement>('[data-hero-name]')!;
-  const condensed = { fontStretch: '62.5%', fontWeight: 820 };
+  const condensed = { fontStretch: NARROW, fontWeight: 840 };
 
   // Where each letter would sit once condensed, measured on an invisible
   // copy of the name, so the spread can place every letter exactly: the
@@ -111,7 +112,7 @@ export function createTitleScene({ chars, wipes, onZoom }: TitleOptions): Scroll
     // Condense and thicken.
     .fromTo(
       chars,
-      { fontStretch: '125%', fontWeight: 200 },
+      { fontStretch: WIDE, fontWeight: 200 },
       { ...condensed, duration: 0.36, ease: 'power1.inOut', stagger: { each: 0.008, from: 'center' } },
       0.1
     )
