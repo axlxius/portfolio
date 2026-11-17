@@ -10,14 +10,14 @@
   z-index: 70;
   inset: -64px;
   pointer-events: none;
-  opacity: 0.045;
+  opacity: 0.035;
   background-repeat: repeat;
   background-size: 128px 128px;
   will-change: transform;
 }
 
 :root[data-theme='dark'] .grain {
-  opacity: 0.06;
+  opacity: 0.04;
 }
 
 /* --- Cursor ---------------------------------------------------------------
