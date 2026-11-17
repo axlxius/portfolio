@@ -1,42 +1,61 @@
 /* ==========================================================================
-   Page structure.
+   Page structure and sections.
 
-   Spacing between sections is owned by .section alone. No other selector sets
-   block padding on a section, so nothing here can cancel anything else out.
+   Reading content keeps to the left two thirds on wide screens. The right
+   third is left open for the 3D object, so type and particles do not fight.
    ========================================================================== */
+
+:root {
+  --content: min(100%, max(64%, 44rem));
+  --chrome-top: clamp(1rem, 2.5vw, 2rem);
+}
 
 /* --- Fixed layers --------------------------------------------------------- */
 
-.scene {
+.scene,
+.dotgrid,
+.shade {
   position: fixed;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.scene {
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.2s var(--ease);
 }
 
-:root[data-ready] .scene {
-  opacity: 1;
-}
-
-/* Stationary dot patch in the top-right corner; see src/scene/CornerDots.js. */
-.corner-dots {
-  position: fixed;
+/* Fine dot grid in the top-right corner; see src/ui/dotgrid.ts. */
+.dotgrid {
   top: 0;
   right: 0;
   width: min(440px, 70vw);
   aspect-ratio: 1 / 1;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.2s var(--ease);
 }
 
-:root[data-ready] .corner-dots {
-  opacity: 1;
+/* Keeps long-form copy readable where the object passes behind it. */
+.shade {
+  inset: 0;
+  background: radial-gradient(
+    110% 80% at 12% 55%,
+    rgb(var(--bg-rgb) / 0.78) 0%,
+    rgb(var(--bg-rgb) / 0.4) 42%,
+    transparent 72%
+  );
+}
+
+/* On narrow screens there is no open third for the object to sit in, so it
+   runs behind the copy. A flat wash keeps the text in front of it. */
+@media (max-width: 760px) {
+  .shade {
+    background: rgb(var(--bg-rgb) / 0.5);
+  }
+}
+
+:root[data-no-webgl] .shade,
+:root[data-no-webgl] .scene {
+  display: none;
 }
 
 .page {
@@ -44,97 +63,208 @@
   z-index: 1;
 }
 
-/* Keeps long-form copy readable over the lattice without hiding it. */
-.shade {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    120% 80% at 18% 50%,
-    rgb(var(--paper-rgb) / 0.82) 0%,
-    rgb(var(--paper-rgb) / 0.45) 45%,
-    transparent 78%
-  );
-}
-
-/* --- Chrome --------------------------------------------------------------- */
+/* --- Header --------------------------------------------------------------- */
 
 .chrome {
   position: fixed;
   z-index: 3;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  top: clamp(1rem, 2.5vw, 2rem);
+  top: var(--chrome-top);
   right: var(--gutter);
   left: var(--gutter);
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  gap: 1.5rem;
   pointer-events: none;
 }
 
-.chrome > * {
+.chrome > *,
+.chrome-right > * {
   pointer-events: auto;
 }
 
 /* Content scrolls under the fixed header; fade it out behind the wordmark
-   rather than letting the two sets of type collide. Full-bleed, so it is
-   pinned to the viewport rather than the gutter-inset header box. */
+   rather than letting the two sets of type collide. */
 .chrome::before {
   content: '';
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: calc(clamp(1rem, 2.5vw, 2rem) * 2 + 2.6rem);
-  background: linear-gradient(
-    to bottom,
-    var(--paper) 0%,
-    var(--paper) 55%,
-    rgb(var(--paper-rgb) / 0) 100%
-  );
+  height: calc(var(--chrome-top) * 2 + 2.6rem);
+  background: linear-gradient(to bottom, var(--bg) 0%, var(--bg) 50%, rgb(var(--bg-rgb) / 0) 100%);
   z-index: -1;
   pointer-events: none;
 }
 
 .wordmark {
+  display: inline-block;
   font-size: var(--size-meta);
   font-weight: 600;
   letter-spacing: -0.01em;
+  padding-block: 0.4rem;
 }
 
 .chrome-right {
   display: flex;
   align-items: center;
-  gap: clamp(0.75rem, 2vw, 1.75rem);
+  gap: clamp(0.75rem, 1.8vw, 1.6rem);
   pointer-events: none;
 }
 
-.marker {
+/* Section nav. The button shows the current section and rolls like an
+   odometer when it changes; the full list opens beneath it. Without a script
+   the list is simply a row of links. */
+.nav {
+  position: relative;
   font-size: var(--size-meta);
   font-weight: 500;
-  color: var(--ink-45);
-  font-variant-numeric: tabular-nums;
+}
+
+.nav-current {
+  display: none;
+  height: 1.6rem;
+  overflow: hidden;
+  color: var(--fg-3);
+  transition: color 0.3s var(--ease);
+}
+
+.nav-current:hover,
+.nav[data-open] .nav-current {
+  color: var(--fg);
+}
+
+.nav-roll {
+  display: block;
+  text-align: right;
+}
+
+.nav-roll > span {
+  display: block;
+  height: 1.6rem;
+  line-height: 1.6rem;
+  white-space: nowrap;
+}
+
+.nav-list {
+  display: flex;
+  gap: 1.1rem;
+}
+
+.nav-list a {
+  color: var(--fg-3);
+  transition: color 0.3s var(--ease);
+}
+
+.nav-list a:hover,
+.nav-list a[aria-current] {
+  color: var(--fg);
+}
+
+html.js .nav-current {
+  display: block;
+}
+
+html.js .nav-list {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: -0.9rem;
+  flex-direction: column;
+  gap: 0;
+  min-width: 9.5rem;
+  padding: 0.4rem 0;
+  background: var(--bg);
+  border: var(--rule);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-0.4rem);
+  transition: opacity 0.3s var(--ease), transform 0.4s var(--ease), visibility 0s 0.3s;
+}
+
+html.js .nav[data-open] .nav-list {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+
+html.js .nav-list a {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.35rem 0.9rem;
+}
+
+html.js .nav-list a::after {
+  content: attr(data-count);
+  font-family: var(--mono);
+  font-size: var(--size-micro);
+  letter-spacing: 0.08em;
+  color: var(--fg-3);
+}
+
+.pref {
+  display: none;
+  align-items: center;
+  gap: 0.45rem;
+  padding-block: 0.4rem;
+  transition: color 0.3s var(--ease);
+}
+
+html.js .pref:not([hidden]) {
+  display: inline-flex;
+}
+
+.pref::after {
+  content: '';
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  background: currentColor;
+  transition: background-color 0.3s var(--ease);
+}
+
+.pref[data-off]::after {
+  background: transparent;
+}
+
+.pref:hover {
+  color: var(--fg);
 }
 
 .toggle {
-  pointer-events: auto;
-  appearance: none;
-  background: transparent;
+  display: inline-block;
   border: var(--rule);
   border-radius: 999px;
-  color: var(--ink);
-  font: inherit;
   font-size: var(--size-meta);
   font-weight: 500;
   padding: 0.4rem 0.9rem;
-  cursor: pointer;
   transition: border-color 0.3s var(--ease), background-color 0.3s var(--ease);
 }
 
 .toggle:hover {
-  background: var(--ink-10);
-  border-color: var(--ink-45);
+  background: var(--wash);
+  border-color: var(--line-strong);
+}
+
+/* Slim scroll progress line along the top edge. */
+.progress {
+  position: fixed;
+  z-index: 4;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  pointer-events: none;
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  background: var(--fg);
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left center;
 }
 
 /* --- Sections ------------------------------------------------------------- */
@@ -149,15 +279,9 @@
   justify-content: center;
 }
 
-.section--intro {
-  justify-content: flex-end;
-  padding-block-end: clamp(4rem, 12vh, 8rem);
-}
-
 /* Display type is set flush left and allowed to run past the right edge.
-   The clip is intentional — the line is a held note, not a contained label. */
-/* Sized from the section, not 100vw: on Windows 100vw includes the vertical
-   scrollbar, which made the page scroll sideways by the scrollbar's width. */
+   Sized from the section, not 100vw: on Windows 100vw includes the vertical
+   scrollbar, which would make the page scroll sideways. */
 .bleed {
   width: calc(100% + var(--gutter) * 2);
   margin-inline-start: calc(var(--gutter) * -1);
@@ -165,85 +289,206 @@
   overflow: hidden;
 }
 
-/* Content column sits left of centre against the open right-hand field. */
-.column {
+/* --- Intro ---------------------------------------------------------------- */
+
+.section--intro {
+  justify-content: flex-end;
+  padding-block-end: clamp(3rem, 9vh, 6rem);
+}
+
+.bleed--hero {
+  /* Room for the letters' swell and for descender-free caps to breathe. */
+  padding-block: 0.06em;
+}
+
+.display .char {
+  display: inline-block;
+  will-change: transform;
+}
+
+.display .char-mask {
+  display: inline-block;
+  overflow: hidden;
+  padding-block: 0.08em;
+  margin-block: -0.08em;
+  vertical-align: bottom;
+}
+
+.intro-body {
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
   max-width: 46rem;
 }
 
-.column--narrow {
-  max-width: 34rem;
+.lead .word {
+  display: inline-block;
 }
 
-.stack-sm > * + * {
-  margin-top: 1.25rem;
-}
-
-.stack-md > * + * {
-  margin-top: clamp(2rem, 5vh, 3.5rem);
-}
-
-/* --- Intro ---------------------------------------------------------------- */
-
-.intro-meta {
+.chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 2.5rem;
-  margin-top: clamp(2rem, 6vh, 3.5rem);
+  gap: 0.5rem;
+  margin-top: clamp(1.75rem, 5vh, 3rem);
+}
+
+.chip {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 0.4rem 0.85rem;
+  border: var(--rule);
+  border-radius: 999px;
+  font-size: var(--size-meta);
+  font-weight: 500;
+  color: var(--fg-2);
+  transition: color 0.35s var(--ease), border-color 0.35s var(--ease);
+}
+
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--accent-invert);
+  transform: translateY(101%);
+  transition: transform 0.45s var(--ease);
+}
+
+.chip:hover {
+  color: var(--on-invert);
+  border-color: var(--fg);
+}
+
+.chip:hover::before {
+  transform: none;
 }
 
 .intro-scroll {
-  margin-top: clamp(2.5rem, 7vh, 4rem);
-  color: var(--ink-45);
-  font-size: var(--size-meta);
-  font-weight: 500;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: clamp(2rem, 6vh, 3.5rem);
+}
+
+.intro-scroll-line {
+  width: 1px;
+  height: 2.6rem;
+  background: var(--fg-3);
+  transform-origin: top center;
+}
+
+html[data-motion='full'] .intro-scroll-line {
+  animation: scroll-cue 2.4s var(--ease-io) infinite;
+}
+
+@keyframes scroll-cue {
+  0% { transform: scaleY(0); transform-origin: top center; }
+  45% { transform: scaleY(1); transform-origin: top center; }
+  55% { transform: scaleY(1); transform-origin: bottom center; }
+  100% { transform: scaleY(0); transform-origin: bottom center; }
 }
 
 /* --- Work ----------------------------------------------------------------- */
 
 .work-list {
-  border-top: var(--rule);
+  width: var(--content);
   margin-top: clamp(2.5rem, 6vh, 4rem);
 }
 
 .work-item {
-  border-bottom: var(--rule);
+  position: relative;
 }
 
 .work-link {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) auto;
-  gap: 0.35rem 2rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) 3.2rem 1.5rem;
+  gap: 0.35rem clamp(1rem, 2vw, 2rem);
   align-items: baseline;
-  padding-block: clamp(1.35rem, 3vh, 2.1rem);
-  transition: padding-inline-start 0.45s var(--ease), color 0.3s var(--ease);
+  width: 100%;
+  padding-block: clamp(1.25rem, 2.8vh, 1.9rem);
+  transition: opacity 0.45s var(--ease);
 }
 
-.work-link:hover,
-.work-link:focus-visible {
-  padding-inline-start: 1.1rem;
-}
-
-/* A row with nowhere to go still lights its strands, but does not shift as
-   if it were clickable. */
-.work-link--static:hover {
-  padding-inline-start: 0;
+.work-index {
+  position: absolute;
+  left: 0;
+  top: calc(clamp(1.25rem, 2.8vh, 1.9rem) + 0.75em);
+  opacity: 0;
+  transform: translateX(-0.6rem);
+  transition: opacity 0.4s var(--ease), transform 0.5s var(--ease);
 }
 
 .work-name {
-  font-size: clamp(1.35rem, 2.6vw, 2.25rem);
+  font-size: clamp(1.35rem, 2.3vw, 2.25rem);
   font-weight: 300;
   font-stretch: 112%;
   letter-spacing: -0.025em;
   line-height: 1.1;
+  color: var(--fg-2);
+  transition: transform 0.5s var(--ease), color 0.3s var(--ease), font-weight 0.5s var(--ease),
+    font-stretch 0.5s var(--ease);
 }
 
 .work-note {
-  color: var(--ink-70);
+  color: var(--fg-2);
   font-size: var(--size-body);
+  line-height: 1.45;
 }
 
 .work-year {
   justify-self: end;
+}
+
+.work-arrow {
+  justify-self: end;
+  align-self: center;
+  opacity: 0;
+  transform: translate(-0.5rem, 0.5rem);
+  transition: opacity 0.35s var(--ease), transform 0.5s var(--ease);
+}
+
+.work-arrow svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* The active row: hovered, focused, or the one in view on touch screens. */
+.work-link.is-active .work-index,
+.work-link:focus-visible .work-index {
+  opacity: 1;
+  transform: none;
+}
+
+.work-link.is-active .work-name,
+.work-link:focus-visible .work-name {
+  transform: translateX(2.4rem);
+  color: var(--fg);
+  font-weight: 400;
+  font-stretch: 118%;
+}
+
+.work-link.is-active .work-arrow,
+.work-link:focus-visible .work-arrow {
+  opacity: 1;
+  transform: none;
+}
+
+.work-list.has-active .work-link:not(.is-active) {
+  opacity: 0.3;
+}
+
+@media (max-width: 1000px) {
+  :root {
+    --content: 100%;
+  }
+}
+
+/* On touch the active row is simply the one in view, so its neighbours stay
+   readable. */
+@media (hover: none) {
+  .work-list.has-active .work-link:not(.is-active) {
+    opacity: 0.6;
+  }
 }
 
 @media (max-width: 760px) {
@@ -253,21 +498,100 @@
 
   .work-note {
     grid-column: 1 / -1;
+    grid-row: 2;
   }
+
+  .work-arrow {
+    display: none;
+  }
+
+  .work-link.is-active .work-name,
+  .work-link:focus-visible .work-name {
+    transform: translateX(2rem);
+  }
+}
+
+/* --- Marquee -------------------------------------------------------------- */
+
+.marquee {
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(1.5rem, 5vh, 3.5rem);
+  user-select: none;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.marquee-run {
+  display: flex;
+  align-items: baseline;
+  flex-shrink: 0;
+}
+
+.marquee-word,
+.marquee-x {
+  font-size: clamp(4rem, 13vw, 15rem);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.marquee-word {
+  font-weight: 600;
+  font-stretch: 125%;
+  letter-spacing: -0.03em;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--fg-2);
+  transition: color 0.5s var(--ease), -webkit-text-stroke-color 0.5s var(--ease);
+}
+
+.marquee-x {
+  font-weight: 200;
+  font-stretch: 100%;
+  color: var(--fg-3);
+  padding-inline: 0.28em;
+}
+
+.marquee:hover .marquee-word {
+  color: var(--fg);
+  -webkit-text-stroke-color: var(--fg);
 }
 
 /* --- Experience ----------------------------------------------------------- */
 
 .roles {
+  width: var(--content);
   margin-top: clamp(2.5rem, 6vh, 4rem);
 }
 
 .role {
+  position: relative;
   display: grid;
-  grid-template-columns: 8rem minmax(0, 1fr);
+  grid-template-columns: 9rem minmax(0, 1fr);
   gap: 0.35rem 2rem;
   padding-block: clamp(1.4rem, 3vh, 2rem);
-  border-top: var(--rule);
+  transition: padding 0.5s var(--ease);
+}
+
+.role > .rule {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.role-date {
+  padding-top: 0.45em;
+  transition: color 0.4s var(--ease);
+}
+
+/* The role being read: its date sharpens and its ring lights in the scene. */
+.role.is-current .role-date {
+  color: var(--fg);
 }
 
 .role-title {
@@ -278,9 +602,40 @@
 }
 
 .role-body {
-  color: var(--ink-70);
+  color: var(--fg-2);
   margin-top: 0.4rem;
   max-width: 48ch;
+}
+
+.role-skills {
+  margin-top: 0.9rem;
+  line-height: 1.6;
+}
+
+/* On devices that hover, the skills line stays folded until the role is
+   hovered or focused. Everywhere else it is simply shown. */
+@media (hover: hover) and (pointer: fine) {
+  html[data-motion='full'] .role-skills {
+    max-height: 0;
+    margin-top: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.5s var(--ease), margin-top 0.5s var(--ease), opacity 0.4s var(--ease);
+  }
+
+  html[data-motion='full'] .role:is(:hover, :focus-visible, :focus-within) .role-skills {
+    max-height: 4rem;
+    margin-top: 0.9rem;
+    opacity: 1;
+  }
+
+  html[data-motion='full'] .role:is(:hover, :focus-visible):has(.role-skills) {
+    padding-block: clamp(1.7rem, 3.6vh, 2.4rem);
+  }
+}
+
+.role:focus-visible {
+  outline-offset: 8px;
 }
 
 @media (max-width: 760px) {
@@ -291,12 +646,57 @@
 
 /* --- Stack ---------------------------------------------------------------- */
 
+.field {
+  position: relative;
+  width: min(100%, max(72%, 44rem));
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.field-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2rem;
+  margin-bottom: clamp(1rem, 2.5vh, 1.75rem);
+}
+
+.field-toggle {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin-left: auto;
+  padding: 0.5rem 0.95rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--fg);
+  transition: color 0.35s var(--ease);
+}
+
+.field-toggle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--accent-invert);
+  transform: translateY(101%);
+  transition: transform 0.45s var(--ease);
+}
+
+.field-toggle:hover,
+.field-toggle[aria-pressed='true'] {
+  color: var(--on-invert);
+}
+
+.field-toggle:hover::before,
+.field-toggle[aria-pressed='true']::before {
+  transform: none;
+}
+
 .groups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-  gap: clamp(2rem, 4vw, 3.5rem);
-  margin-top: clamp(2.5rem, 6vh, 4rem);
-  max-width: 62rem;
+  grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr));
+  gap: clamp(1.75rem, 3vw, 3rem);
 }
 
 .group-name {
@@ -304,25 +704,77 @@
   font-weight: 600;
   letter-spacing: -0.01em;
   padding-bottom: 0.7rem;
-  border-bottom: var(--rule);
+}
+
+.group-name button {
+  font-weight: inherit;
+  transition: opacity 0.3s var(--ease);
 }
 
 .group-list {
-  margin-top: 0.9rem;
-  color: var(--ink-70);
+  margin-top: 0.75rem;
+  color: var(--fg-2);
 }
 
-.group-list li + li {
-  margin-top: 0.3rem;
+.pill {
+  position: relative;
+  width: fit-content;
+  transition: opacity 0.4s var(--ease);
 }
 
-/* Entries that run to more than one line need room to breathe. */
-.group-list--wide li {
-  line-height: 1.45;
+.pill > span {
+  display: inline-block;
+  margin-left: -0.7rem;
+  padding: 0.16rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  white-space: nowrap;
+  transition: border-color 0.35s var(--ease), background-color 0.35s var(--ease), color 0.35s var(--ease);
 }
 
-.group-list--wide li + li {
-  margin-top: 0.65rem;
+/* A word becomes a pill once it leaves the list: dragged, or scattered. */
+.field.is-live .pill {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: transform;
+}
+
+.field.is-live .pill:hover > span,
+.field.is-scattered .pill > span,
+.pill.is-held > span {
+  border-color: var(--line-strong);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.field.is-scattered .pill {
+  touch-action: none;
+}
+
+.pill.is-held {
+  z-index: 2;
+}
+
+.pill.is-held > span {
+  border-color: var(--fg);
+}
+
+/* Scattered words roam over the column headings, so those step back. */
+.field .group-name,
+.field .group > .rule {
+  transition: opacity 0.4s var(--ease);
+}
+
+.field.is-scattered .group-name,
+.field.is-scattered .group > .rule {
+  opacity: 0.22;
+}
+
+/* Focusing one category pulls its words together and quietens the rest. */
+.field.has-focus .group:not(.is-focus) .pill,
+.field.has-focus .group:not(.is-focus) .group-name button {
+  opacity: 0.25;
 }
 
 /* Education and certifications sit below the skill groups, divided from them,
@@ -331,46 +783,237 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: clamp(1.75rem, 4vw, 3.5rem);
-  max-width: 62rem;
-  margin-top: clamp(2.75rem, 7vh, 4.5rem);
-  padding-top: clamp(1.75rem, 4vh, 2.75rem);
-  border-top: var(--rule);
+  width: min(100%, max(72%, 44rem));
+  margin-top: clamp(3rem, 8vh, 5rem);
+}
+
+.cred-list {
+  margin-top: 0.9rem;
+  color: var(--fg-2);
+}
+
+.cred-list li {
+  line-height: 1.45;
+}
+
+.cred-list li + li {
+  margin-top: 0.65rem;
+}
+
+.honour {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.2rem;
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.star {
+  flex-shrink: 0;
+  transition: transform 0.9s var(--ease);
+}
+
+.cred-list li:hover .star {
+  transform: rotate(180deg) scale(1.25);
+}
+
+.cert {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  gap: 0 0.75rem;
+  align-items: center;
+}
+
+.cert-name {
+  transition: color 0.3s var(--ease);
+}
+
+.cert:hover .cert-name {
+  color: var(--fg);
+}
+
+/* The seal: a ring that is always there, and a check that is stamped in. */
+.seal {
+  color: var(--fg-3);
+  transition: color 0.3s var(--ease), transform 0.6s var(--ease);
+}
+
+.seal-ring {
+  stroke-dasharray: 1;
+}
+
+.seal-dash {
+  opacity: 0.6;
+  transform-origin: 16px 16px;
+}
+
+.seal-check {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 0.5s var(--ease) 0.05s;
+}
+
+.cert:hover .seal {
+  color: var(--fg);
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.cert:hover .seal-check {
+  stroke-dashoffset: 0;
+}
+
+html[data-motion='full'] .cert:hover .seal-dash {
+  animation: seal-spin 6s linear infinite;
+}
+
+@keyframes seal-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (hover: none) {
+  .seal-check {
+    stroke-dashoffset: 0;
+  }
 }
 
 /* --- Contact -------------------------------------------------------------- */
 
+.section--contact {
+  justify-content: flex-end;
+  padding-block-end: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.section--contact > .bleed {
+  margin-top: auto;
+}
+
+.contact-body {
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  max-width: 40rem;
+}
+
 .contact-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 2.5rem;
+  gap: 0.75rem;
   margin-top: clamp(2rem, 5vh, 3rem);
 }
 
+/* Magnetic buttons. The fill is a white layer in difference mode, so it
+   inverts the label beneath it in either theme without a second colour. */
 .contact-link {
-  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--bg);
+  font-size: clamp(1.05rem, 1.5vw, 1.3rem);
   font-weight: 400;
-  padding-bottom: 0.2rem;
-  border-bottom: 1px solid var(--ink-45);
-  transition: border-color 0.3s var(--ease), opacity 0.3s var(--ease);
+  will-change: transform;
 }
 
-.contact-link:hover,
-.contact-link:focus-visible {
-  border-color: var(--ink);
+.contact-link > span {
+  display: inline-block;
+}
+
+.contact-link::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: #fff;
+  mix-blend-mode: difference;
+  clip-path: circle(0% at var(--mx, 50%) var(--my, 50%));
+  transition: clip-path 0.55s var(--ease);
+  pointer-events: none;
+}
+
+.contact-link:hover::after,
+.contact-link:focus-visible::after {
+  clip-path: circle(150% at var(--mx, 50%) var(--my, 50%));
 }
 
 .colophon {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
   gap: 0.5rem 2rem;
-  margin-top: clamp(4rem, 12vh, 8rem);
+  margin-top: auto;
   padding-top: 1.25rem;
-  border-top: var(--rule);
 }
 
-/* --- Fallback ------------------------------------------------------------- */
+.section--contact .contact-body {
+  margin-bottom: clamp(4rem, 14vh, 9rem);
+}
 
-:root[data-no-webgl] .shade {
-  display: none;
+.colophon > .rule {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.colophon-place {
+  justify-self: end;
+  text-align: right;
+}
+
+[data-clock]:not(:empty)::before {
+  content: ' / ';
+}
+
+.to-top {
+  position: relative;
+  padding: 0.5rem 0;
+  transition: color 0.3s var(--ease);
+}
+
+.to-top:hover {
+  color: var(--fg);
+}
+
+/* The launch line: a hairline that shoots up from the link as it is used. */
+.to-top-line {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 1px;
+  height: 40vh;
+  background: linear-gradient(to top, var(--fg), transparent);
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+
+@media (max-width: 760px) {
+  .colophon {
+    grid-template-columns: 1fr auto;
+  }
+
+  .to-top {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .pref[data-sound-toggle] {
+    display: none !important;
+  }
+}
+
+/* --- Reduced motion ---------------------------------------------------------
+   The manual switch and the OS setting both land here. Transitions that only
+   exist to move things are cut; colour changes stay. */
+
+html[data-motion='reduce'] *,
+html[data-motion='reduce'] *::before,
+html[data-motion='reduce'] *::after {
+  animation-duration: 0.001s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001s !important;
+  scroll-behavior: auto !important;
 }

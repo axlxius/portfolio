@@ -11,8 +11,8 @@
     />
     <link rel="canonical" href="https://alexius-lee.vercel.app/work/housing-and-fertility/" />
 
-    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="../../apple-touch-icon.png" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="Alexius Lee" />
@@ -27,23 +27,8 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-
-    <!-- Same pre-paint theme resolution as the home page. -->
-    <script>
-      (function () {
-        try {
-          var stored = localStorage.getItem('portfolio-theme');
-          var dark =
-            stored === 'dark' ||
-            (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
-          document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-        } catch (e) {
-          document.documentElement.dataset.theme = 'light';
-        }
-      })();
-    </script>
+    <!-- Font preload and the pre-paint theme script; see vite.config.ts. -->
+    <!--@boot-->
   </head>
 
   <body>
@@ -58,7 +43,7 @@
       <a class="case-back" href="../../#work">&larr; All work</a>
 
       <div class="bleed">
-        <h1 class="title" data-reveal><span>Housing and Fertility</span></h1>
+        <h1 class="title" data-reveal><span class="title-inner">Housing and Fertility</span></h1>
       </div>
 
       <p class="lead">
@@ -119,6 +104,6 @@
       </footer>
     </main>
 
-    <script type="module" src="../../src/case.js"></script>
+    <script type="module" src="../../src/case.ts"></script>
   </body>
 </html>

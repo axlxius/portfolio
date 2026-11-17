@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Showcase compositor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=block"
+    />
+    <style>
+      /* Static layout only. Nothing here animates: every moving value is set
+         by render(t) below. */
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #000; }
+      body { font-family: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+      canvas { position: absolute; inset: 0; }
+      .mask { position: absolute; overflow: hidden; white-space: nowrap; }
+      .mask > span { display: block; will-change: transform; }
+      .caption { left: 192px; top: 964px; height: 48px; font-size: 30px; line-height: 48px; font-weight: 400; font-stretch: 100%; }
+      .index { right: 192px; top: 964px; height: 48px; font-size: 30px; line-height: 48px; font-weight: 400; font-variant-numeric: tabular-nums; }
+      .title { left: 72px; top: 336px; height: 216px; font-size: 200px; line-height: 216px; font-weight: 200; font-stretch: 125%; letter-spacing: -0.01em; }
+      .link { top: 640px; height: 48px; font-size: 30px; line-height: 48px; font-weight: 400; }
+    </style>
+  </head>
+  <body>
+    <canvas id="stage" width="1920" height="1080"></canvas>
+    <div id="text"></div>
+
+    <script type="module">
+      import {
+        CAPTIONS, CASE, DRIFT, END, EXIT, FPS, FRAMED, H, INDEX, MAIN_END, OUTRO, REVEAL, SLIDE, STAGGER,
+        THEME_DURATION, THEME_SWITCH, W, clamp01, ease, frameScale, lerp, span,
+      } from './timeline.mjs';
+
+      const params = new URLSearchParams(location.search);
+      const manifest = await (await fetch(params.get('manifest') || 'out/manifest.json')).json();
+
+      const stage = document.getElementById('stage');
+      const ctx = stage.getContext('2d');
+      const offscreen = () => {
+        const c = document.createElement('canvas');
+        c.width = W;
+        c.height = H;
+        return c;
+      };
+      const layer = { main: offscreen(), case: offscreen() }; // sub-frame averages
+      const frame = offscreen(); // the site window at site scale
+      const accum = offscreen(); // motion-blur accumulator for the slide
+
+      // --- Text ------------------------------------------------------------
+      const text = document.getElementById('text');
+      function mask(cls, value, extra = {}) {
+        const m = document.createElement('div');
+        m.className = `mask ${cls}`;
+        Object.assign(m.style, extra);
+        const s = document.createElement('span');
+        s.textContent = value;
+        m.append(s);
+        text.append(m);
+        return s;
+      }
+      const captions = CAPTIONS.map((c) => ({ ...c, el: mask('caption', c.text) }));
+      const indices = INDEX.map((c) => ({ ...c, el: mask('index', c.text) }));
+      const title = { ...END.title, el: mask('title', END.title.text) };
+      const links = END.links.items.map((item, i) => ({
+        in: END.links.in + i * STAGGER,
+        el: mask('link', item),
+      }));
+
+      await document.fonts.load('200 200px Archivo');
+      await document.fonts.load('400 30px Archivo');
+      await document.fonts.ready;
+      // Lay the end-card links out in a row with a 48px gap.
+      {
+        let left = 72;
+        for (const l of links) {
+          l.el.parentElement.style.left = `${left}px`;
+          left += l.el.getBoundingClientRect().width + 48;
+        }
+      }
+
+      /** One clip reveal in, one fade out. Same curve as the site's headings. */
+      function animateLine(item, t, colour) {
+        const { el } = item;
+        const inK = ease(span(t, item.in, item.in + REVEAL));
+        const outK = item.out === undefined ? 0 : ease(span(t, item.out, item.out + EXIT));
+        el.style.transform = `translateY(${(1 - inK) * 110}%) translateY(${-8 * outK}px)`;
+        el.style.opacity = String((t < item.in ? 0 : 1) * (1 - outK));
+        el.style.color = colour;
+      }
+
+      // --- Images ------------------------------------------------------------
+      const cache = new Map();
+      function load(src) {
+        if (!cache.has(src)) {
+          const img = new Image();
+          img.src = src;
+          cache.set(src, img.decode().then(() => img));
+          if (cache.size > 48) cache.delete(cache.keys().next().value);
+        }
+        return cache.get(src);
+      }
+
+      /** Draws frame f of a capture into its layer canvas, averaging sub-frames. */
+      async function fill(kind, f) {
+        const files = manifest[kind][f];
+        if (!files) return false;
+        const imgs = await Promise.all(files.map((n) => load(`out/${kind}/${n}`)));
+        const c = layer[kind].getContext('2d');
+        // Running average: the k-th image at alpha 1/(k+1) leaves an equal mix.
+        imgs.forEach((img, k) => {
+          c.globalAlpha = 1 / (k + 1);
+          c.drawImage(img, 0, 0);
+        });
+        c.globalAlpha = 1;
+        return true;
+      }
+
+      // --- Colour ---------------------------------------------------------------
+      const themeAt = (t) => ease(span(t, THEME_SWITCH, THEME_SWITCH + THEME_DURATION));
+      const grey = (v) => `rgb(${v},${v},${v})`;
+
+      /** Composes the site window (both pages) at time ts into `frame`. */
+      function composeFrame(ts, has) {
+        const c = frame.getContext('2d');
+        const m = themeAt(ts);
+        c.fillStyle = grey(Math.round(255 * m));
+        c.fillRect(0, 0, W, H);
+
+        const slide = ease(span(ts, SLIDE.t0, SLIDE.t1));
+        if (has.main) {
+          const d = lerp(1, DRIFT.to, ease(span(ts, DRIFT.t0, DRIFT.t1)));
+          const y = -slide * H;
+          c.drawImage(layer.main, (W - W * d) / 2, (H - H * d) / 2 + y, W * d, H * d);
+        }
+        if (has.case) {
+          const y = (1 - slide) * H;
+          c.globalAlpha = 1 - ease(span(ts, OUTRO.t0, OUTRO.t1));
+          c.drawImage(layer.case, 0, y);
+          c.globalAlpha = 1;
+        }
+      }
+
+      window.render = async (t) => {
+        const f = Math.round(t * FPS);
+        const has = {
+          main: t <= MAIN_END && (await fill('main', f)),
+          case: t >= SLIDE.t0 && t <= CASE.end + 1 / FPS && (await fill('case', f)),
+        };
+        if (t > CASE.end) has.case = false;
+
+        const m = themeAt(t);
+        const bg = Math.round(255 * m);
+        const ink = 255 - bg;
+        document.body.style.background = grey(bg);
+        ctx.fillStyle = grey(bg);
+        ctx.fillRect(0, 0, W, H);
+
+        // Frame geometry: centre rises 60px as it shrinks to the framed size,
+        // which leaves the bottom margin for the caption rail.
+        const outro = ease(span(t, OUTRO.t0, OUTRO.t1));
+        const s = frameScale(t) + 0.02 * outro;
+        const k = clamp01((1 - frameScale(t)) / (1 - FRAMED));
+        const fw = W * s, fh = H * s;
+        const fx = W / 2 - fw / 2, fy = 540 - 60 * k - fh / 2;
+
+        if (has.main || has.case) {
+          // The slide between pages is the one move fast enough to need blur
+          // here; captured scrolls already carry their own sub-frames.
+          const speed = Math.abs(ease(span(t + 1 / FPS, SLIDE.t0, SLIDE.t1)) - ease(span(t, SLIDE.t0, SLIDE.t1))) * H;
+          const samples = speed > 24 ? 6 : 1;
+          const a = accum.getContext('2d');
+          for (let j = 0; j < samples; j++) {
+            composeFrame(t + (j * 0.5) / FPS / samples, has);
+            a.globalAlpha = 1 / (j + 1);
+            a.drawImage(frame, 0, 0);
+          }
+          a.globalAlpha = 1;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(accum, fx, fy, fw, fh);
+
+          // Hairline frame, the site's --rule: ink at 0.2.
+          const hair = 0.2 * k * (1 - outro);
+          if (hair > 0.001) {
+            ctx.strokeStyle = `rgba(${ink},${ink},${ink},${hair})`;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(Math.round(fx) - 0.5, Math.round(fy) - 0.5, Math.round(fw) + 1, Math.round(fh) + 1);
+          }
+
+          // Cursor ring, in site pixels mapped through the frame.
+          const cur = manifest.cursor[f];
+          if (has.main && cur && cur.opacity > 0) {
+            const r = 6 * (1 - 0.25 * cur.press);
+            ctx.strokeStyle = `rgba(${ink},${ink},${ink},${cur.opacity})`;
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(fx + cur.x * s, fy + cur.y * s, r, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        }
+
+        const colour = grey(ink);
+        const dim = `rgba(${ink},${ink},${ink},0.45)`;
+        captions.forEach((c) => animateLine(c, t, colour));
+        indices.forEach((c) => animateLine(c, t, dim));
+        animateLine(title, t, colour);
+        links.forEach((l, i) => animateLine(l, t, i === 0 ? colour : dim));
+
+        // Make sure the DOM has painted the values just set.
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      };
+
+      window.ready = true;
+    </script>
+  </body>
+</html>
