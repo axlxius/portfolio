@@ -67,7 +67,7 @@ export function createReveals() {
 
   // Hairlines.
   const ruleBatch = ScrollTrigger.batch('.rule', {
-    start: 'top 94%',
+    start: 'top 98%',
     once: true,
     onEnter: (batch) => {
       gsap.fromTo(
@@ -88,7 +88,8 @@ export function createReveals() {
   // are left to the intro sequence.
   const fades = qsa('[data-fade]').filter((n) => !n.closest('#intro'));
   const fadeBatch = ScrollTrigger.batch(fades, {
-    start: 'top 92%',
+    // Late enough that the footer still triggers at the very end of the page.
+    start: 'top 97%',
     once: true,
     onEnter: (batch) => {
       gsap.fromTo(

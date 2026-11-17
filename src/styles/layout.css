@@ -475,6 +475,14 @@ html[data-motion='full'] .intro-scroll-line {
   }
 }
 
+/* On touch the active row is simply the one in view, so its neighbours stay
+   readable. */
+@media (hover: none) {
+  .work-list.has-active .work-link:not(.is-active) {
+    opacity: 0.6;
+  }
+}
+
 @media (max-width: 760px) {
   .work-link {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -742,6 +750,17 @@ html[data-motion='full'] .intro-scroll-line {
 
 .pill.is-held > span {
   border-color: var(--fg);
+}
+
+/* Scattered words roam over the column headings, so those step back. */
+.field .group-name,
+.field .group > .rule {
+  transition: opacity 0.4s var(--ease);
+}
+
+.field.is-scattered .group-name,
+.field.is-scattered .group > .rule {
+  opacity: 0.22;
 }
 
 /* Focusing one category pulls its words together and quietens the rest. */

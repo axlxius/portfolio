@@ -443,7 +443,11 @@ export default class Scene {
     const tier = TIERS[this.tier];
     (u.uInk.value as Color).setScalar(this.theme);
     u.uAdditive.value = this.theme;
-    const gain = lerp(INK_GAIN, 1, this.theme) * sampleTrack(WEIGHT, this.progress);
+    // On narrow screens the object sits behind the copy, so it is held back
+    // everywhere except the hero.
+    const narrow = 1 - clamp((this.camera.aspect - 0.85) / 0.55, 0, 1);
+    const behindCopy = lerp(1, 0.5, narrow * clamp(this.progress * 2, 0, 1));
+    const gain = lerp(INK_GAIN, 1, this.theme) * sampleTrack(WEIGHT, this.progress) * behindCopy;
     u.uOpacity.value = tier.opacity * gain;
     u.uLineOpacity.value = tier.line * gain * 1.2;
 

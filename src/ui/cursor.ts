@@ -29,6 +29,8 @@ export function createCursor() {
   ring.append(shape, label);
   root.append(ring, dot);
   document.body.append(root);
+  // Parked off-screen until the pointer first moves.
+  dot.style.transform = ring.style.transform = 'translate3d(-100px, -100px, 0)';
 
   const pos = { x: -100, y: -100 };
   const lag = { x: -100, y: -100 };
