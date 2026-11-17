@@ -14,14 +14,18 @@ const SETTLE = 0.5; // below this distance from rest, stop touching the DOM
  * resize, never per frame.
  */
 export function createHeroName(chars: HTMLElement[]) {
-  if (!finePointer || chars.length === 0) return;
+  if (!finePointer || chars.length === 0) return null;
 
   const hero = qs('#intro');
   const letters = chars.map((node) => ({ node, x: 0, y: 0, weight: REST, applied: REST }));
   const pointer = { x: -9999, y: -9999, active: false };
   let radius = 200;
+  let ready = false;
+
+  let stale = true;
 
   function measure() {
+    stale = false;
     // Measured at rest weight, in page coordinates.
     letters.forEach((l) => (l.node.style.fontWeight = ''));
     letters.forEach((l) => {
@@ -33,9 +37,11 @@ export function createHeroName(chars: HTMLElement[]) {
     radius = (chars[0]?.getBoundingClientRect().height ?? 200) * 0.95;
   }
 
-  window.addEventListener('resize', measure, { passive: true });
-  document.fonts.ready.then(measure);
-  measure();
+  // Measuring is deferred to the next frame that needs it, so it never runs
+  // while the intro still has the letters displaced.
+  const invalidate = () => (stale = true);
+  window.addEventListener('resize', invalidate, { passive: true });
+  document.fonts.ready.then(invalidate);
 
   window.addEventListener(
     'pointermove',
@@ -50,9 +56,10 @@ export function createHeroName(chars: HTMLElement[]) {
 
   gsap.ticker.add((_time, deltaMs) => {
     // Nothing to do once the name has scrolled away.
-    if (window.scrollY > window.innerHeight) return;
+    if (window.scrollY > window.innerHeight || !ready) return;
     const k = damp(9, Math.min(deltaMs / 1000, 0.05));
     const live = pointer.active && !motion.reduced;
+    if (live && stale) measure();
 
     for (const l of letters) {
       let target = REST;
@@ -71,4 +78,12 @@ export function createHeroName(chars: HTMLElement[]) {
       }
     }
   });
+
+  return {
+    /** Call once the intro has finished and the letters are at rest. */
+    ready() {
+      ready = true;
+      stale = true;
+    },
+  };
 }

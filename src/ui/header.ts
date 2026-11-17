@@ -74,7 +74,12 @@ export function createHeader(sections: HTMLElement[]) {
     current.setAttribute('aria-expanded', String(open));
   }
 
-  current?.addEventListener('click', () => setOpen(!nav?.hasAttribute('data-open')));
+  current?.addEventListener('click', (event) => {
+    // A mouse has already opened the list by hovering; its click must not
+    // close it again. Keyboard and touch toggle.
+    const byMouse = finePointer && event.detail > 0;
+    setOpen(byMouse ? true : !nav?.hasAttribute('data-open'));
+  });
   if (finePointer) {
     nav?.addEventListener('pointerenter', () => setOpen(true));
     nav?.addEventListener('pointerleave', () => setOpen(false));

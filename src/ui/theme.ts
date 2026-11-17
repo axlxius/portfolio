@@ -64,9 +64,12 @@ export function createTheme(onChange: Listener) {
         );
       })
       .catch(() => {});
-    transition.finished.finally(() => {
+    // A second toggle mid-wipe skips this transition, which rejects these
+    // promises. That is expected, so both outcomes just clean up.
+    const done = () => {
       if (root.dataset.vt === 'theme') delete root.dataset.vt;
-    });
+    };
+    transition.finished.then(done, done);
   }
 
   function toggle() {

@@ -19,7 +19,13 @@ const pad2 = (n: number) => String(n + 1).padStart(2, '0');
  * and is returned to the row that opened it.
  */
 export function createOverlay(scroll: SmoothScroll) {
-  const root = el('div', 'overlay', { role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'overlay-title' });
+  const root = el('div', 'overlay', {
+    role: 'dialog',
+    'aria-modal': 'true',
+    'aria-labelledby': 'overlay-title',
+    // The sheet scrolls natively; smooth scrolling must leave its wheel alone.
+    'data-lenis-prevent': '',
+  });
   root.innerHTML = `
     <div class="overlay-inner">
       <div class="overlay-bar">
@@ -97,7 +103,7 @@ export function createOverlay(scroll: SmoothScroll) {
   }
 
   /** Run a DOM change inside a view transition when one is available. */
-  function transition(change: () => void, shared: HTMLElement | null) {
+  function transition(change: () => void, shared: HTMLElement | null = null) {
     const html = document.documentElement;
     if (motion.reduced || typeof document.startViewTransition !== 'function') {
       change();
@@ -110,68 +116,65 @@ export function createOverlay(scroll: SmoothScroll) {
       if (shared) shared.style.viewTransitionName = '';
       change();
     });
-    vt.finished.finally(() => {
+    // A newer transition can skip this one, which rejects its promises. That
+    // is expected: the DOM change has still been applied.
+    const done = () => {
       if (html.dataset.vt === 'overlay') delete html.dataset.vt;
-      titleEl.style.viewTransitionName = '';
-      if (shared) shared.style.viewTransitionName = '';
-    });
+    };
+    vt.finished.then(done, done);
+    vt.ready.catch(() => {});
   }
 
   function open(i: number, from: HTMLElement | null, closed?: () => void) {
     if (index >= 0) return;
+    index = i;
     opener = from;
     onClose = closed ?? null;
-    const rowTitle = from?.querySelector<HTMLElement>('.work-name') ?? null;
 
     transition(() => {
-      index = i;
       fill(PROJECTS[i], i);
       titleEl.style.viewTransitionName = 'project-title';
       root.classList.add('is-open');
       page.forEach((node) => node?.setAttribute('inert', ''));
-    }, rowTitle);
+      // Focus moves in only once the dialog is actually on screen.
+      titleEl.focus({ preventScroll: true });
+    }, from?.querySelector<HTMLElement>('.work-name') ?? null);
 
     scroll.lock(true);
     runner.start();
     history.pushState({ overlay: PROJECTS[i].slug }, '');
-    titleEl.focus({ preventScroll: true });
   }
 
   function close(fromHistory = false) {
     if (index < 0) return;
-    const rowTitle = opener?.querySelector<HTMLElement>('.work-name') ?? null;
-    titleEl.style.viewTransitionName = 'project-title';
+    index = -1;
+    const from = opener;
+    const rowTitle = from?.querySelector<HTMLElement>('.work-name') ?? null;
+    opener = null;
 
     transition(() => {
+      // Hand the shared name back to the row for the return trip.
       titleEl.style.viewTransitionName = '';
       if (rowTitle) rowTitle.style.viewTransitionName = 'project-title';
       root.classList.remove('is-open');
       page.forEach((node) => node?.removeAttribute('inert'));
-      index = -1;
-    }, null);
-    // The shared name is handed back to the row for the return trip.
-    setTimeout(() => rowTitle && (rowTitle.style.viewTransitionName = ''), 900);
+      from?.focus({ preventScroll: true });
+    });
+    window.setTimeout(() => rowTitle && (rowTitle.style.viewTransitionName = ''), 900);
 
     scroll.lock(false);
     runner.stop();
     if (!fromHistory && history.state?.overlay) history.back();
-    opener?.focus({ preventScroll: true });
     onClose?.();
-    opener = null;
+    onClose = null;
   }
 
   function step(delta: number) {
     if (index < 0) return;
-    const next = (index + delta + PROJECTS.length) % PROJECTS.length;
-    const change = () => {
-      index = next;
-      fill(PROJECTS[next], next);
-    };
-    if (motion.reduced || typeof document.startViewTransition !== 'function') change();
-    else {
-      document.documentElement.dataset.vt = 'overlay';
-      document.startViewTransition(change).finished.finally(() => delete document.documentElement.dataset.vt);
-    }
+    index = (index + delta + PROJECTS.length) % PROJECTS.length;
+    const next = index;
+    titleEl.style.viewTransitionName = '';
+    transition(() => fill(PROJECTS[next], next));
   }
 
   part('close').addEventListener('click', () => close());
@@ -179,7 +182,9 @@ export function createOverlay(scroll: SmoothScroll) {
   part('next').addEventListener('click', () => step(1));
   window.addEventListener('popstate', () => close(true));
 
-  root.addEventListener('keydown', (event) => {
+  // Listened for on the document, so the keys work wherever focus has landed.
+  document.addEventListener('keydown', (event) => {
+    if (index < 0) return;
     if (event.key === 'Escape') {
       event.preventDefault();
       close();
@@ -192,7 +197,10 @@ export function createOverlay(scroll: SmoothScroll) {
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
       const active = document.activeElement;
-      if (event.shiftKey && (active === first || active === titleEl)) {
+      if (!root.contains(active)) {
+        event.preventDefault();
+        first.focus();
+      } else if (event.shiftKey && (active === first || active === titleEl)) {
         event.preventDefault();
         last.focus();
       } else if (!event.shiftKey && active === last) {

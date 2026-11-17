@@ -60,11 +60,16 @@ createMarquee(scroll);
 const sound = createSound(scroll);
 
 // --- Sections ---------------------------------------------------------------------
+let heroName: ReturnType<typeof createHeroName> = null;
+let introDone = false;
 const intro = playIntro(() => {
-  // Once the hero has landed, the scroll reveals take over.
+  // The hero has landed: its letters can be measured and the page re-measured.
+  introDone = true;
+  heroName?.ready();
   progress.measure();
 });
-createHeroName(intro.chars);
+heroName = createHeroName(intro.chars);
+if (introDone) heroName?.ready();
 createReveals();
 createWork(overlay, preview);
 createExperience();

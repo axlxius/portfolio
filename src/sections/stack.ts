@@ -138,9 +138,13 @@ export function createStackField(cursor: Cursor | null) {
       button.addEventListener('pointerenter', () => setFocus(i));
       button.addEventListener('pointerleave', () => setFocus(-1));
     }
-    // Click or keyboard toggles, so the focus is reachable without hover.
-    button.addEventListener('click', () => setFocus(focus === i ? -1 : i));
-    button.addEventListener('blur', () => !finePointer || setFocus(-1));
+    // Keyboard and touch toggle, so the focus is reachable without hover. A
+    // mouse click is ignored: hovering has already done the job.
+    button.addEventListener('click', (event) => {
+      if (finePointer && event.detail > 0) return;
+      setFocus(focus === i ? -1 : i);
+    });
+    button.addEventListener('blur', () => finePointer && setFocus(-1));
   });
 
   // --- Dragging ------------------------------------------------------------------
