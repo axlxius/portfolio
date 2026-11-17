@@ -263,13 +263,22 @@ video/                the showcase film pipeline and the link-preview image scri
 
 ## Performance
 
-Measured with Lighthouse on the production build, desktop profile:
-Performance 97, Accessibility 100, Best Practices 100, SEO 100, with LCP at
-0.8s and layout shift at 0.011.
+Lighthouse on the production build, desktop profile, on a machine with no GPU:
 
-That run was on a machine with no GPU, where the scene falls back to its
-lowest tier. The text paints first either way: the scene is a separate chunk
-loaded after first paint, and the fonts are self-hosted and preloaded.
+| Run | Performance | Accessibility | Best Practices | SEO |
+| --- | --- | --- | --- | --- |
+| WebGL off (the site's own code) | 100 | 100 | 100 | 100 |
+| WebGL on, software renderer | 72–83 | 100 | 100 | 100 |
+
+The gap is the software renderer, not the page. A trace of the WebGL run shows
+its one long task is a single 640ms `GPUTask`: graphics work that a real GPU
+does off the main thread, but that a GPU-less machine runs on it. With WebGL
+off, total blocking time is 0ms and LCP is 0.5s.
+
+The text paints first either way: the scene is a separate chunk loaded after
+first paint, its set-up yields to the browser between steps (loading three.js,
+building the cloud, the first render), and non-urgent work such as the film
+grain and the scroll reveals waits for an idle moment.
 
 ## Taste notes
 
@@ -320,9 +329,10 @@ colour.
   axe-core) all ran in Chromium. Safari and Firefox have not been
   run. The theme wipe and the overlay's title transition use the View
   Transitions API and fall back to a plain switch where it is missing.
-- **Frame rate on real hardware is unmeasured.** The build machine has no GPU,
-  so the 60fps target and the tier thresholds are reasoned, not benchmarked.
-  If a device struggles, lower its tier in `chooseTier`.
+- **Frame rate and Lighthouse on real hardware are unmeasured.** The build
+  machine has no GPU, so the 60fps target, the tier thresholds and the
+  WebGL-on Lighthouse score are not representative. If a device struggles,
+  lower its tier in `chooseTier`.
 - **Device tilt** works where the browser reports orientation without asking
   (Android). On iOS the scene does not tilt.
 - **Pinned scenes on phones.** Pins and scrubs run on touch screens too and

@@ -46,7 +46,6 @@ const hud = createHud(sections);
 bindMotionSwitch();
 const headings = createHeadingSkew();
 createCursor();
-createGrain();
 createMagnetics();
 const sound = createSound(scroll);
 const overlay = createOverlay(scroll);
@@ -76,8 +75,15 @@ const intro = playIntro(() => {
 heroName = createHeroName(intro.chars);
 if (introDone) heroName?.ready();
 
-createReveals();
-createContact(scroll);
+// Work that nothing on the first screen needs waits for an idle moment, so
+// the intro and the first scene are not held up by it.
+const whenIdle = (fn: () => void) =>
+  'requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 1200 }) : setTimeout(fn, 200);
+whenIdle(createGrain);
+whenIdle(() => {
+  createReveals();
+  createContact(scroll);
+});
 
 // --- The scenes -------------------------------------------------------------------
 // With motion, the first three scenes are pinned and scrubbed. Without it the
@@ -86,29 +92,54 @@ const anchorsStatic = createSectionProgress(sections);
 let director: ReturnType<typeof buildScenes> | null = null;
 let inReel = false;
 
+/** Hand the main thread back to the browser between bits of set-up work. */
+const yieldToMain = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+
 function buildScenes() {
   const triggers: Record<string, ScrollTrigger | null> = {};
-  const ctx = gsap.context(() => {
-    triggers.title = createTitleScene({
-      chars: intro.chars,
-      wipes,
-      onZoom: (factor) => sceneRef.current?.setZoom(factor),
-    });
-    triggers.reel = createReel({
-      overlay,
-      scroll,
-      onProject: (i) => {
-        inReel = i >= 0;
-        sceneRef.current?.setTakeover(i >= 0 ? (PROJECTS[i].visual as TakeoverId) : null);
-        sceneRef.current?.setBand(i >= 0 ? i : null);
-      },
-    });
-    triggers.timeline = createTimeline({
-      wipes,
-      onRole: (i) => sceneRef.current?.setRole(i < 0 ? null : i),
-    });
-    triggers.kit = createKit();
-  });
+  const ctx = gsap.context(() => {});
+  let cancelled = false;
+
+  // Each scene is built in its own task, in page order, so no single task
+  // blocks the page for long while the intro plays. One refresh at the end
+  // lays out every pin at once.
+  const steps: Array<() => void> = [
+    () => {
+      triggers.title = createTitleScene({
+        chars: intro.chars,
+        wipes,
+        onZoom: (factor) => sceneRef.current?.setZoom(factor),
+      });
+    },
+    () => {
+      triggers.reel = createReel({
+        overlay,
+        scroll,
+        onProject: (i) => {
+          inReel = i >= 0;
+          sceneRef.current?.setTakeover(i >= 0 ? (PROJECTS[i].visual as TakeoverId) : null);
+          sceneRef.current?.setBand(i >= 0 ? i : null);
+        },
+      });
+    },
+    () => {
+      triggers.timeline = createTimeline({
+        wipes,
+        onRole: (i) => sceneRef.current?.setRole(i < 0 ? null : i),
+      });
+    },
+    () => {
+      triggers.kit = createKit();
+    },
+  ];
+  void (async () => {
+    for (const step of steps) {
+      await yieldToMain();
+      if (cancelled) return;
+      ctx.add(step);
+    }
+    ScrollTrigger.refresh();
+  })();
 
   // Morph stops: each pinned scene holds its form for the length of its pin,
   // and the cloud reforms in the scroll between scenes.
@@ -154,6 +185,7 @@ function buildScenes() {
       return anchors[anchors.length - 1][1];
     },
     destroy() {
+      cancelled = true;
       ScrollTrigger.removeEventListener('refresh', measure);
       ctx.revert();
     },
@@ -184,7 +216,6 @@ function setMode(reduced: boolean) {
     });
   } else {
     director = buildScenes();
-    ScrollTrigger.refresh();
   }
 }
 
@@ -212,8 +243,12 @@ async function startScene() {
     return;
   }
   try {
+    // Loading three.js, building the cloud and its first render are each
+    // heavy; yielding between them keeps any one task short.
     const { default: Scene } = await import('./scene/Scene.ts');
+    await yieldToMain();
     const scene = new Scene(canvas);
+    await yieldToMain();
     sceneRef.current = scene;
     applyInk(true);
     scene.setProgress(morphAt(window.scrollY), true);

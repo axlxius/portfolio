@@ -78,10 +78,13 @@ export function createHud(sections: HTMLElement[]) {
     const at = marks.map((_, i) => Math.min(1, (starts[i] ?? 0) / max));
     marks.forEach((a, i) => {
       a.parentElement?.style.setProperty('--at', `${(at[i] * 100).toFixed(2)}%`);
-      // Room for "05 Toolkit" before the next mark, or just the number.
-      const gap = ((at[i + 1] ?? 1.12) - at[i]) * width;
-      a.classList.toggle('is-tight', gap < 120);
-      a.classList.toggle('is-end', at[i] > 0.9);
+      // Room for "05 Toolkit" beside its neighbours, or just the number. A
+      // label near the right edge hangs left, so it needs room on that side.
+      const end = at[i] > 0.9;
+      const after = ((at[i + 1] ?? 1.12) - at[i]) * width;
+      const before = (at[i] - (at[i - 1] ?? -1)) * width;
+      a.classList.toggle('is-tight', after < 120 || (end && before < 120));
+      a.classList.toggle('is-end', end);
       a.title = sections[i].dataset.section ?? '';
     });
     scrubber?.classList.add('is-live');

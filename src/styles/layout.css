@@ -266,6 +266,8 @@ html.js .scrubber.is-live .scrubber-marks li {
 }
 
 html.js .scrubber.is-live .mark {
+  min-width: 24px;
+  min-height: 24px;
   padding: 0.4rem 0.6rem 0 0;
 }
 
