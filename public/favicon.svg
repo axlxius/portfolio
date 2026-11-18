@@ -1,12 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <style>
-    path { stroke: #000; }
-    @media (prefers-color-scheme: dark) {
-      path { stroke: #fff; }
-    }
-  </style>
-  <!-- "AL" monogram in thin strokes, echoing the light, wide Archivo display
-       type. No tile: the ink sits directly on the tab and inverts in dark
-       mode, like the site's ink/paper palette. -->
-  <path d="M4 52 L18 12 L32 52 M8.9 38 H27.1 M40 12 V52 H60" fill="none" stroke-width="4" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" />
+  <!-- "AL" in heavy strokes on an ink tile, like the site's wordmark. -->
+  <rect width="64" height="64" fill="#170a03" />
+  <path d="M8 54 L20 12 L32 54 M13.5 40 H26.5 M41 12 V49.5 H57" fill="none" stroke="#fff0de" stroke-width="9" stroke-linecap="butt" stroke-linejoin="bevel" />
 </svg>
