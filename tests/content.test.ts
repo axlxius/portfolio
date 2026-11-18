@@ -3,17 +3,6 @@ import { test } from 'node:test';
 
 import { CERTIFICATIONS, EDUCATION, PROJECTS, ROLES, SECTIONS, SKILLS } from '../src/data/content.ts';
 import { renderBody, renderMeta } from '../src/markup/page.ts';
-import { BANDS, ROLES as ROLE_SEGMENTS, STATE_COUNT } from '../src/scene/shapes.ts';
-
-test('the scene has a band per project and a segment per role', () => {
-  assert.equal(PROJECTS.length, BANDS, 'change BANDS in src/scene/shapes.ts to match the project list');
-  assert.equal(ROLES.length, ROLE_SEGMENTS, 'change ROLES in src/scene/shapes.ts to match the role list');
-});
-
-test('one morph state per section, plus the closing line', () => {
-  assert.equal(SECTIONS.length + 1, STATE_COUNT);
-});
-
 test('role skills come only from the Stack lists', () => {
   const known = new Set(SKILLS.flatMap((g) => g.items));
   for (const role of ROLES) {
@@ -43,9 +32,14 @@ test('the generated page carries every project, role, skill and credit', () => {
   for (const section of SECTIONS) assert.ok(html.includes(`id="${section.id}"`));
 });
 
-test('every scene has a scrubber mark that links to it', () => {
+test('the bar links to every section after the intro', () => {
   const html = renderBody();
-  for (const section of SECTIONS) assert.ok(html.includes(`href="#${section.id}" data-mark="${section.id}"`));
+  for (const section of SECTIONS.slice(1)) assert.ok(html.includes(`href="#${section.id}" data-nav="${section.id}"`));
+});
+
+test('every role year rolls to the year its dates start', () => {
+  const html = renderBody();
+  for (const role of ROLES) assert.ok(html.includes(`data-roll="${role.dates.match(/\d{4}/)?.[0]}"`), role.dates);
 });
 
 test('headings are in order: one h1, then h2 per section, h3 beneath', () => {

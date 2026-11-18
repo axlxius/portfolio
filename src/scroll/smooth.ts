@@ -7,8 +7,8 @@ import { motion } from '../core/motion.ts';
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Smooth scrolling, driven from GSAP's ticker so the scroll position, the
- * scroll-triggered reveals and the 3D scene are all sampled in one frame.
+ * Smooth scrolling, driven from GSAP's ticker so the scroll position and the
+ * scroll-triggered animations are sampled in one frame.
  *
  * With reduced motion there is no Lenis at all: the browser's native scroll is
  * used untouched and anchors jump instead of gliding.
@@ -56,10 +56,9 @@ export function createSmoothScroll() {
     const target = document.querySelector<HTMLElement>(id);
     if (!target) return;
     event.preventDefault();
-    // A pinned scene sits at the far end of its spacer once played through;
-    // its start is the top of the spacer.
-    const spacer = target.parentElement?.classList.contains('pin-spacer') ? target.parentElement : null;
-    scrollTo((spacer ?? target).getBoundingClientRect().top + window.scrollY);
+    // The sticky header covers the top of the page; land below it.
+    const header = document.querySelector('.top')?.getBoundingClientRect().height ?? 0;
+    scrollTo(target.id === 'intro' ? 0 : target.getBoundingClientRect().top + window.scrollY - header);
     // Keep keyboard focus moving with the jump.
     target.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });

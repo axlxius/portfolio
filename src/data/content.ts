@@ -3,7 +3,7 @@
  *
  * The page markup is generated from this at build time (see vite.config.ts and
  * src/markup/page.ts), so the HTML that ships already contains the text and
- * reads fine with JavaScript or WebGL switched off. Edit copy here and nowhere
+ * reads fine with JavaScript switched off. Edit copy here and nowhere
  * else. Role and project copy mirrors the resume: keep the two in step.
  */
 
@@ -23,15 +23,11 @@ export const LINKS = {
 
 // --- Types -------------------------------------------------------------------
 
-/** The generative visual a project uses; see src/visuals/. */
-export type VisualId = 'site' | 'dashboard' | 'copilot' | 'growcery' | 'housing' | 'clinic';
-
 export interface Project {
   slug: string;
   title: string;
   note: string;
   year: string;
-  visual: VisualId;
   /** Where the project came from, if stated in its write-up. */
   context?: string;
   /** Tools named in the project's write-up. Leave empty rather than guess. */
@@ -74,8 +70,19 @@ export const INTRO = {
   /** The one line that survives on the title card. */
   short: 'I build data dashboards and full-stack tools, and I enjoy tinkering with new ways to solve old problems.',
   tags: ['Business and financial technology', 'Based in Singapore', 'Open to work'],
-  cue: 'Scroll to play',
+  /** The sticker beside the name. */
+  sticker: 'Open to work',
 } as const;
+
+/** The strip that runs along the top of the page. */
+export const TICKER = [
+  'Open to work',
+  'Product Management Intern at GovTech',
+  'Based in Singapore',
+  'Business and financial technology, Nanyang Polytechnic',
+  "Director's List",
+  'Dashboards and full-stack tools',
+] as const;
 
 // --- Selected work -----------------------------------------------------------
 
@@ -85,11 +92,10 @@ export const PROJECTS: Project[] = [
   {
     slug: 'this-site',
     title: 'This Site',
-    note: 'The site you are on. One Three.js object that reforms into a different shape for every section.',
+    note: 'The site you are on. Loud colour, chunky type, and nearly everything on it moves.',
     year: '2026',
-    visual: 'site',
     context: 'Personal project',
-    tech: ['Three.js', 'GLSL', 'TypeScript', 'GSAP', 'Lenis', 'Vite'],
+    tech: ['TypeScript', 'GSAP', 'Lenis', 'Vite'],
     writeUp: null,
     live: LINKS.site,
     repo: 'https://github.com/axlxius/portfolio',
@@ -99,7 +105,6 @@ export const PROJECTS: Project[] = [
     title: 'Portfolio Dashboard',
     note: 'Streamlit dashboard tracking a Singapore multi-asset book, with live broker pricing and labelled fallbacks.',
     year: '2026',
-    visual: 'dashboard',
     context: 'Personal project',
     tech: ['Python', 'Streamlit', 'pandas', 'Moomoo OpenD API'],
     writeUp: './work/portfolio-dashboard/',
@@ -111,7 +116,6 @@ export const PROJECTS: Project[] = [
     title: 'SCI Copilot',
     note: 'Copilot for insurance agents: knowledge retrieval, compliance checks and document drift detection, as an installable PWA.',
     year: '2026',
-    visual: 'copilot',
     context: 'Business Innovation Project, Nanyang Polytechnic',
     tech: ['React', 'Vite', 'Supabase', 'Capacitor'],
     writeUp: './work/sci-copilot/',
@@ -123,7 +127,6 @@ export const PROJECTS: Project[] = [
     title: 'GrowcerySG',
     note: 'Urban farming marketplace with produce trading, carbon footprint tracking and gamified sustainability tasks.',
     year: '2026',
-    visual: 'growcery',
     context: 'Business Application Development, Nanyang Polytechnic (team project)',
     tech: ['C#', 'ASP.NET Web Forms', 'SQL Server', 'JavaScript', 'WebSockets'],
     writeUp: './work/growcerysg/',
@@ -135,7 +138,6 @@ export const PROJECTS: Project[] = [
     title: 'Housing and Fertility',
     note: "Tableau study linking HDB resale prices and median income to Singapore's falling fertility rate.",
     year: '2025',
-    visual: 'housing',
     context: 'Business Analytics Project, Nanyang Polytechnic',
     tech: ['Tableau'],
     writeUp: './work/housing-and-fertility/',
@@ -147,7 +149,6 @@ export const PROJECTS: Project[] = [
     title: 'pay2live',
     note: 'Modular web app for clinic operations, with scheduling, WhatsApp OTP and real-time notifications.',
     year: '2025',
-    visual: 'clinic',
     // No write-up yet, so nothing is claimed about its context or tools.
     tech: [],
     writeUp: null,
@@ -237,17 +238,13 @@ export const CONTACT = {
     { label: 'LinkedIn', href: LINKS.linkedin, kind: 'external' },
     { label: 'Resume', href: LINKS.resume, kind: 'file' },
   ],
-  built: 'Built with Three.js and Vite',
+  built: 'Built with TypeScript, GSAP, Lenis and Vite',
   place: 'Singapore',
 } as const;
 
-// --- Marquee -------------------------------------------------------------------
-
-export const MARQUEE = ['Business', 'Technology', 'Finance', 'Data'] as const;
-
 // --- Scene labels ----------------------------------------------------------------
 
-/** Small headings for the scenes that have no display title of their own. */
+/** Headings for the sections that have no title of their own above. */
 export const LABELS = {
   experience: 'Experience',
   stack: 'Toolkit',
@@ -256,7 +253,7 @@ export const LABELS = {
 
 // --- Sections ------------------------------------------------------------------
 
-/** Section ids and header labels, in page order. One morph state each. */
+/** Section ids and navigation labels, in page order. */
 export const SECTIONS = [
   { id: 'intro', label: 'Intro' },
   { id: 'work', label: 'Work' },
