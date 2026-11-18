@@ -14,7 +14,6 @@ export function createHero() {
   const name = qs('[data-hero-name]');
   if (!name) return;
   const lines = qsa('[data-hero-line]', name);
-  const sticker = qs('[data-sticker]', name);
   const first = lines[0];
 
   // Split each line into letters. The heading keeps an accessible name.
@@ -98,8 +97,7 @@ export function createHero() {
           clearProps: 'all',
         },
         0
-      )
-      .from(sticker, { scale: 0, rotate: -60, duration: 0.6, ease: 'back.out(2.2)', clearProps: 'transform' }, 0.9);
+      );
   }
 
   const jelly = (el: HTMLElement) => {

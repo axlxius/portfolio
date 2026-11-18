@@ -37,9 +37,9 @@ const PAIRS: Array<[string, string]> = [
   ['bg', 'ink'], // inverted blocks and hovered slabs
 ];
 
-test('there are three palettes, with Tangerine first as the default', () => {
-  assert.deepEqual(Object.keys(palettes()), ['tangerine', 'night', 'lilac']);
-  assert.match(css, /:root,\s*:root\[data-palette='tangerine'\]/);
+test('there are three palettes, with Cream first as the default', () => {
+  assert.deepEqual(Object.keys(palettes()), ['cream', 'night', 'lilac']);
+  assert.match(css, /:root,\s*:root\[data-palette='cream'\]/);
 });
 
 test('every text pairing in every palette reaches WCAG AA (4.5:1)', () => {

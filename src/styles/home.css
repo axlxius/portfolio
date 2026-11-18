@@ -184,11 +184,6 @@ html[data-motion='full'] .wordmark-mark {
   white-space: nowrap;
 }
 
-.hero-line--2 {
-  display: flex;
-  align-items: center;
-  gap: 0.12em;
-}
 
 .ch {
   display: inline-block;
@@ -218,30 +213,8 @@ html.js[data-motion='full'] .hero-name:not(.is-in) {
   visibility: hidden;
 }
 
-.sticker {
-  flex: none;
-  display: inline-block;
-  padding: 0.35em 0.55em 0.3em;
-  background: var(--second);
-  color: var(--on-second);
-  border: var(--border);
-  font-size: clamp(0.9rem, 2.1vw, 2rem);
-  font-weight: 900;
-  letter-spacing: 0;
-  line-height: 1;
-  transform: rotate(-7deg);
-  box-shadow: 6px 6px 0 var(--ink);
-}
 
-html[data-motion='full'] .sticker {
-  transition: transform 0.4s var(--pop);
-}
 
-@media (hover: hover) {
-  html[data-motion='full'] .sticker:hover {
-    transform: rotate(5deg) scale(1.12);
-  }
-}
 
 .hero-foot {
   display: grid;

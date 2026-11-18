@@ -2,7 +2,7 @@ import { motion } from '../core/motion.ts';
 
 /** Keep in step with the palettes in src/styles/base.css. */
 export const PALETTES = {
-  tangerine: { name: 'Tangerine', bg: '#ff5b14' },
+  cream: { name: 'Cream', bg: '#fff0de' },
   lilac: { name: 'Lilac', bg: '#b8a3ff' },
   night: { name: 'Night', bg: '#170a03' },
 } as const;
@@ -36,7 +36,7 @@ export function createPalette() {
     // Storage blocked: the button still works for this visit.
   }
 
-  const current = (): PaletteId => (isPalette(root.dataset.palette) ? root.dataset.palette : 'tangerine');
+  const current = (): PaletteId => (isPalette(root.dataset.palette) ? root.dataset.palette : 'cream');
 
   function paint(id: PaletteId) {
     root.dataset.palette = id;
@@ -85,7 +85,7 @@ export function createPalette() {
   );
 
   media.addEventListener('change', () => {
-    if (!chosen) set(media.matches ? 'night' : 'tangerine');
+    if (!chosen) set(media.matches ? 'night' : 'cream');
   });
 
   paint(current());

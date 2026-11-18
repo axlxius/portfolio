@@ -3,8 +3,8 @@
 
    Loud, flat colour and heavy type. Each palette is a handful of solid
    colours, with no gradients or transparency in the surfaces: a background, the
-   ink on it, an accent for the loudest things, a second colour for stickers,
-   cream for cards, and a cell colour a shade off the background.
+   ink on it, an accent for the loudest things, a second colour, a card
+   colour, and a cell colour a shade off the background.
    Every text pairing is checked for contrast in tests/palette.test.ts.
    ========================================================================== */
 
@@ -28,16 +28,16 @@
 
 /* Keep in step with PALETTES in src/fx/palette.ts. */
 :root,
-:root[data-palette='tangerine'] {
-  --bg: #ff5b14;
+:root[data-palette='cream'] {
+  --bg: #fff0de;
   --ink: #170a03;
   --accent: #d9ff3b;
   --on-accent: #170a03;
-  --second: #fff0de;
+  --second: #b8a3ff;
   --on-second: #170a03;
-  --cell: #e84a06;
+  --cell: #f2dcc0;
   --on-cell: #170a03;
-  --card: #fff0de;
+  --card: #ffffff;
   --on-card: #170a03;
   color-scheme: light;
 }
@@ -45,9 +45,9 @@
 :root[data-palette='night'] {
   --bg: #170a03;
   --ink: #fff0de;
-  --accent: #ff5b14;
+  --accent: #d9ff3b;
   --on-accent: #170a03;
-  --second: #d9ff3b;
+  --second: #b8a3ff;
   --on-second: #170a03;
   --cell: #2b1609;
   --on-cell: #fff0de;
@@ -59,9 +59,9 @@
 :root[data-palette='lilac'] {
   --bg: #b8a3ff;
   --ink: #170a03;
-  --accent: #ff5b14;
+  --accent: #d9ff3b;
   --on-accent: #170a03;
-  --second: #d9ff3b;
+  --second: #fff0de;
   --on-second: #170a03;
   --cell: #a68cff;
   --on-cell: #170a03;

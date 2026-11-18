@@ -49,7 +49,7 @@ copy.
 | --- | --- |
 | Email, GitHub, LinkedIn, resume | `LINKS` |
 | Page title, link-preview image | `META` |
-| Name, intro line, tags, sticker | `INTRO` (`short` is the line under the name) |
+| Name, intro line, tags | `INTRO` (`short` is the line under the name) |
 | The strip along the top | `TICKER` |
 | Projects | `PROJECTS` |
 | Roles | `ROLES` |
@@ -91,7 +91,7 @@ file. Its slab then links there.
 | Section | What moves |
 | --- | --- |
 | Top | The ticker runs along the top and pauses under the pointer. The bar marks the section on screen. |
-| Intro | The name drops in letter by letter, tumbling, while it inflates from weight 100 and 55% width to 900 and 112%. Then the letters bob in a slow wave, and each one wobbles like jelly when the pointer touches it (or a finger taps it). The sticker spins in last. |
+| Intro | The name drops in letter by letter, tumbling, while it inflates from weight 100 and 55% width to 900 and 112%. Then the letters bob in a slow wave, and each one wobbles like jelly when the pointer touches it (or a finger taps it). |
 | Work | "Selected work" slams in from the right and overshoots. The count rolls up from 00. Each slab slams in from its own side, tilted, then leans toward the pointer and turns to ink on hover. Clicking one throws a burst of shapes before the page changes. |
 | Experience | Each year rolls up from 1999 like a tape counter. |
 | Toolkit | Each skill group is a band of huge type running sideways, alternate bands in opposite directions. Scrolling speeds them up, and scrolling up runs them backwards. |
@@ -100,7 +100,7 @@ file. Its slab then links there.
 Things play again if you scroll back above them and down again. Typing the
 Konami code throws confetti.
 
-The **Colour** button cycles three palettes, Tangerine, Lilac and Night,
+The **Colour** button cycles three palettes, Cream, Lilac and Night,
 flooding the new one out from the button as a circle. The choice is remembered;
 until a visitor picks, a device in dark mode gets Night.
 
@@ -156,7 +156,7 @@ palette for contrast.
 - Every text and background pairing in all three palettes reaches 4.5:1
   (`tests/palette.test.ts`).
 - The name is split into letters for the animation, with the heading keeping
-  its accessible name. The ticker, the sticker, the count and the years are
+  its accessible name. The ticker, the count and the years are
   decoration and hidden from screen readers; the same facts are in the text.
   Copies made for the moving bands are hidden too, so each skill is read once.
 - Controls are at least 44px tall. Hover effects have a press equivalent on

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- "AL" in heavy strokes on a tangerine tile, like the site's wordmark. -->
-  <rect width="64" height="64" fill="#ff5b14" />
-  <path d="M8 54 L20 12 L32 54 M13.5 40 H26.5 M41 12 V49.5 H57" fill="none" stroke="#170a03" stroke-width="9" stroke-linecap="butt" stroke-linejoin="bevel" />
+  <!-- "AL" in heavy strokes on an ink tile, like the site's wordmark. -->
+  <rect width="64" height="64" fill="#170a03" />
+  <path d="M8 54 L20 12 L32 54 M13.5 40 H26.5 M41 12 V49.5 H57" fill="none" stroke="#fff0de" stroke-width="9" stroke-linecap="butt" stroke-linejoin="bevel" />
 </svg>

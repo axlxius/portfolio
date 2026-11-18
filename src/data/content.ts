@@ -70,8 +70,6 @@ export const INTRO = {
   /** The one line that survives on the title card. */
   short: 'I build data dashboards and full-stack tools, and I enjoy tinkering with new ways to solve old problems.',
   tags: ['Business and financial technology', 'Based in Singapore', 'Open to work'],
-  /** The sticker beside the name. */
-  sticker: 'Open to work',
 } as const;
 
 /** The strip that runs along the top of the page. */
@@ -173,13 +171,6 @@ export const ROLES: Role[] = [
     title: 'Sales Account Manager, SME Sales, Veritas Organisation',
     body: 'Owned a portfolio of SME energy clients from first call to renewal, with consistently high conversion. Ran a heavy calendar of residential roadshows and cold outreach campaigns to keep the pipeline full.',
     skills: ['Key account management', 'Lead sourcing', 'Sales presentations'],
-  },
-  {
-    dates: '2023 to 2024',
-    title: 'Receptionist, FriendsGolf Singapore. Usher, National Gallery Singapore',
-    body: 'Front desk, payments, visitor guidance and event setup, worked alongside full-time study.',
-    // Nothing in the Stack lists maps to these roles, so no tag line shows.
-    skills: [],
   },
 ];
 

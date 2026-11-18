@@ -66,7 +66,7 @@ function intro(): string {
       <section class="hero" id="intro" aria-labelledby="intro-title">
         <h1 class="hero-name heavy" id="intro-title" data-hero-name>
           <span class="hero-line" data-hero-line>${esc(first)}</span>
-          <span class="hero-line hero-line--2"><span data-hero-line>${esc(rest.join(' '))}</span><span class="sticker" data-sticker aria-hidden="true">${esc(INTRO.sticker)}</span></span>
+          <span class="hero-line" data-hero-line>${esc(rest.join(' '))}</span>
         </h1>
         <div class="hero-foot">
           <p class="lead" data-pop>${esc(INTRO.short)}</p>
@@ -246,7 +246,7 @@ export function renderMeta(): string {
     <meta property="og:image" content="${META.ogImage}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="${esc(META.name)}, set in heavy type on orange" />
+    <meta property="og:image:alt" content="${esc(META.name)}, set in heavy type on cream" />
     <meta property="og:locale" content="${META.locale}" />
     <meta property="profile:first_name" content="Alexius" />
     <meta property="profile:last_name" content="Lee" />
@@ -272,8 +272,8 @@ export const BOOT_SCRIPT = `
           palette = localStorage.getItem('portfolio-palette');
           motion = localStorage.getItem('portfolio-motion');
         } catch (e) {}
-        if (palette !== 'tangerine' && palette !== 'night' && palette !== 'lilac') {
-          palette = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'tangerine';
+        if (palette !== 'cream' && palette !== 'night' && palette !== 'lilac') {
+          palette = matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'cream';
         }
         root.dataset.palette = palette;
         var reduce = motion === 'reduce' || (motion !== 'full' && matchMedia('(prefers-reduced-motion: reduce)').matches);
