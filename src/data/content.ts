@@ -69,12 +69,11 @@ export const INTRO = {
     'Business and financial technology student at Nanyang Polytechnic, currently interning at GovTech. I build data dashboards and full-stack tools, and I enjoy tinkering with new ways to solve old problems.',
   /** The one line that survives on the title card. */
   short: 'I build data dashboards and full-stack tools, and I enjoy tinkering with new ways to solve old problems.',
-  tags: ['Business and financial technology', 'Based in Singapore', 'Open to work'],
+  tags: ['Business and financial technology', 'Based in Singapore'],
 } as const;
 
 /** The strip that runs along the top of the page. */
 export const TICKER = [
-  'Open to work',
   'Product Management Intern at GovTech',
   'Based in Singapore',
   'Business and financial technology, Nanyang Polytechnic',
@@ -222,7 +221,7 @@ export const CERTIFICATIONS = [
 
 export const CONTACT = {
   title: 'Get in touch',
-  body: 'I am open to work and I read everything that arrives. Email reaches me fastest.',
+  body: 'I read everything that arrives, and email reaches me fastest.',
   links: [
     { label: 'Email', href: `mailto:${LINKS.email}`, kind: 'email' },
     { label: 'GitHub', href: LINKS.github, kind: 'external' },
