@@ -2,8 +2,8 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 
-import { EASE } from '../core/ease.ts';
-import { el, qs, qsa } from '../core/env.ts';
+import { qs, qsa } from '../core/env.ts';
+import { createOdometer } from '../ui/odometer.ts';
 import type { SmoothScroll } from '../scroll/smooth.ts';
 import type { Overlay } from '../ui/overlay.ts';
 
@@ -60,6 +60,8 @@ export function createReel({ overlay, scroll, onProject }: ReelOptions): ScrollT
   });
   tl.to({}, { duration: OUTRO }, INTRO + n);
 
+  const counter = count ? createOdometer(count, '00') : null;
+
   let live = -2;
   function setLive(index: number) {
     if (index === live) return;
@@ -68,26 +70,7 @@ export function createReel({ overlay, scroll, onProject }: ReelOptions): ScrollT
     cards.forEach((c, i) => c.item.classList.toggle('is-live', i === index));
     onProject(index);
 
-    if (count) {
-      const label = Object.assign(el('span'), { textContent: index < 0 ? '00' : String(index + 1).padStart(2, '0') });
-      const old = count.lastElementChild;
-      gsap.killTweensOf(count);
-      if (!old) return void count.replaceChildren(label);
-      count.replaceChildren(...(down ? [old, label] : [label, old]));
-      gsap.fromTo(
-        count,
-        { yPercent: down ? 0 : -50 },
-        {
-          yPercent: down ? -50 : 0,
-          duration: 0.5,
-          ease: EASE,
-          onComplete: () => {
-            count.replaceChildren(label);
-            gsap.set(count, { yPercent: 0 });
-          },
-        }
-      );
-    }
+    counter?.set(index < 0 ? '00' : String(index + 1).padStart(2, '0'), down ? 1 : -1);
   }
 
   const trigger = ScrollTrigger.create({

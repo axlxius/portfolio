@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { EASE } from '../core/ease.ts';
 import { el, qs, qsa } from '../core/env.ts';
 import { motion } from '../core/motion.ts';
+import { createOdometer } from '../ui/odometer.ts';
 
 // The page reads as a short film: the whole scroll maps to this running time.
 const RUNTIME = 96; // seconds
@@ -20,7 +21,7 @@ export function timecode(seconds: number): string {
 
 /**
  * The heads-up display: the scene label (which rolls like an odometer), a
- * running timecode, and the scrubber along the bottom with its playhead.
+ * running timecode whose digits roll over with the scroll, and the scrubber along the bottom with its playhead.
  * The scrubber's marks are the section links; once the page is laid out each
  * one sits where its scene starts.
  */
@@ -34,7 +35,10 @@ export function createHud(sections: HTMLElement[]) {
 
   let starts: number[] = sections.map((s) => s.offsetTop);
   let index = -1;
-  let lastTc = '';
+  let lastY = window.scrollY;
+  // Frames turn over fastest, so the timecode's digits settle quickly; the
+  // seconds and minutes still read as a counter rolling over.
+  const counter = tc ? createOdometer(tc, timecode(0), { duration: 0.32 }) : null;
 
   function label(i: number) {
     return `${String(i + 1).padStart(2, '0')} ${sections[i].dataset.section ?? ''}`;
@@ -109,11 +113,8 @@ export function createHud(sections: HTMLElement[]) {
       for (let i = 1; i < starts.length; i++) if (starts[i] <= mid) now = i;
       setScene(now);
 
-      const code = timecode(p * RUNTIME);
-      if (tc && code !== lastTc) {
-        tc.textContent = code;
-        lastTc = code;
-      }
+      counter?.set(timecode(p * RUNTIME), y > lastY ? 1 : y < lastY ? -1 : 0);
+      lastY = y;
       fill?.style.setProperty('--p', p.toFixed(4));
       if (scrubber && playhead) {
         playhead.style.transform = `translate3d(${(p * scrubber.clientWidth).toFixed(1)}px, 0, 0)`;

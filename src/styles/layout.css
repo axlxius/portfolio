@@ -1063,3 +1063,29 @@ html[data-motion='reduce'] *::after {
   transition-duration: 0.001s !important;
   scroll-behavior: auto !important;
 }
+
+/* Rolling digits (src/ui/odometer.ts): each digit is a one-character window
+   onto a strip of 0-9 and a second 0. */
+.odo {
+  display: inline-flex;
+  align-items: flex-start;
+  height: 1.6rem;
+  line-height: 1.6rem;
+  overflow: hidden;
+  font-variant-numeric: tabular-nums;
+}
+
+.odo-digit {
+  display: block;
+  height: 1.6rem;
+  overflow: hidden;
+}
+
+.odo-strip,
+.odo-strip > span {
+  display: block;
+}
+
+.odo-strip {
+  will-change: transform;
+}
